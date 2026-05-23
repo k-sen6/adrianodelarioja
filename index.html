@@ -1481,15 +1481,15 @@
 <button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
 
 <!-- ============================================ -->
-<!-- NUEVO SCRIPT MODULAR - Reemplaza el anterior -->
+<!-- SCRIPTS MODULARES - Versión Paso 5          -->
 <!-- ============================================ -->
 
 <!-- Cargar módulos principales -->
 <script type="module" src="js/main.js"></script>
 
-<!-- Script legacy para funciones globales que necesitan estar disponibles para onclick inline -->
+<!-- Script legacy para funciones globales (necesarias para onclick inline) -->
 <script>
-  // Exponer funciones necesarias para los onclick inline de los botones
+  // Exponer funciones necesarias para los botones con onclick
   window.addToCart = function(productId, productName, productPrice, productImage) {
     import('./js/cart.js').then(module => {
       module.addToCart(productId, productName, productPrice, productImage);
@@ -1509,6 +1509,20 @@
       }
     }).catch(err => console.error('Error loading wishlist module:', err));
   };
+  
+  // Filtros
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const category = this.dataset.filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      import('./js/products.js').then(module => {
+        if (module.filterProducts) {
+          module.filterProducts(category);
+        }
+      }).catch(err => console.error('Error loading products module:', err));
+    });
+  });
 </script>
 
 </body>
