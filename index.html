@@ -9,7 +9,7 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Supabase -->
+    <!-- Supabase - Cargar como variable global sin conflictos -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -552,17 +552,23 @@
 <button class="back-to-top" id="backToTop">↑</button>
 
 <script>
+// Usar IIFE para evitar conflictos globales
 (function() {
-    // ============================================
-    // CONFIGURACIÓN SUPABASE
-    // ============================================
-    const SUPABASE_URL = '__SUPABASE_URL__';
-    const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
-    
     console.log('🚀 Iniciando aplicación...');
-    console.log('📦 Conectando a Supabase...');
     
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Verificar que Supabase está cargado
+    if (typeof supabase === 'undefined' && typeof window.supabase === 'undefined') {
+        console.error('❌ Supabase no está cargado');
+        document.getElementById('productGrid').innerHTML = '<div class="loading">❌ Error: Supabase no cargado</div>';
+        return;
+    }
+    
+    const supabaseClient = window.supabase.createClient(
+        '__SUPABASE_URL__',
+        '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs'
+    );
+    
+    console.log('📦 Cliente Supabase creado');
     
     // ============================================
     // ESTADO GLOBAL
