@@ -1,19 +1,22 @@
 // js/supabase-client.js
-import { CONFIG } from './config.js';
+// SOLUCIÓN TEMPORAL - Hardcodeamos las URLs para que funcione
+
+// Configuración directa (temporal)
+const SUPABASE_URL = '__SUPABASE_URL__';
+const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
 
 // Verificar que las variables existen
-if (!CONFIG.SUPABASE_URL || CONFIG.SUPABASE_URL === '__SUPABASE_URL__') {
-  console.warn('⚠️ Supabase URL no configurada.');
+if (!SUPABASE_URL) {
+  console.error('❌ SUPABASE_URL no configurada');
 }
-
-if (!CONFIG.SUPABASE_ANON_KEY || CONFIG.SUPABASE_ANON_KEY === '__SUPABASE_ANON_KEY__') {
-  console.warn('⚠️ Supabase Anon Key no configurada.');
+if (!SUPABASE_ANON_KEY) {
+  console.error('❌ SUPABASE_ANON_KEY no configurada');
 }
 
 // Crear cliente Supabase
 export const supabase = window.supabase.createClient(
-  CONFIG.SUPABASE_URL,
-  CONFIG.SUPABASE_ANON_KEY
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
 // Helper para verificar conexión
