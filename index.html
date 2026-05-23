@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adriano de la Rioja · Atelier de Alta Costura · La Habana</title>
     <meta name="description" content="Moda de autor escultórica. Prendas y calzado hechos a mano en La Habana Vieja.">
-    <meta name="theme-color" content="#050505">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,7 +48,7 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(5, 5, 5, 0.9);
+            background: rgba(5, 5, 5, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
         }
@@ -92,6 +91,7 @@
         .header-actions {
             display: flex;
             gap: 1rem;
+            align-items: center;
         }
         
         .header-icon {
@@ -123,6 +123,18 @@
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: 1rem;
+                text-align: center;
+                border-bottom: 1px solid var(--gold);
+            }
+            .nav-links.active {
+                display: flex;
             }
             .menu-icon {
                 display: block;
@@ -162,6 +174,12 @@
             letter-spacing: 3px;
         }
         
+        .hero-overlay h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            margin-top: 1rem;
+        }
+        
         /* Product Grid */
         .product-grid {
             display: grid;
@@ -195,7 +213,7 @@
         
         .product-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin-bottom: 0.3rem;
         }
         
@@ -283,7 +301,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 10000;
             align-items: center;
             justify-content: center;
@@ -300,6 +318,12 @@
             text-align: center;
             max-width: 400px;
             width: 90%;
+            border: 1px solid var(--gold);
+        }
+        
+        .modal-content h3 {
+            color: var(--gold);
+            margin-bottom: 1rem;
         }
         
         .modal-content input {
@@ -320,6 +344,7 @@
             width: 100%;
             cursor: pointer;
             font-weight: bold;
+            margin-top: 0.5rem;
         }
         
         /* Cart Sidebar */
@@ -333,10 +358,27 @@
             z-index: 10001;
             transition: right 0.3s;
             padding: 1rem;
+            overflow-y: auto;
+            border-left: 1px solid var(--gold);
         }
         
         .cart-sidebar.open {
             right: 0;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+        }
+        
+        .cart-item-img {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
         }
         
         /* Social Buttons */
@@ -409,8 +451,6 @@
 </head>
 <body>
 
-<div style="position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: var(--gold); z-index: 1002;"></div>
-
 <!-- Modal Login -->
 <div id="loginModal" class="modal">
     <div class="modal-content">
@@ -425,7 +465,7 @@
 <!-- Cart Sidebar -->
 <div id="cartSidebar" class="cart-sidebar">
     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-        <h3>✦ Tu selección ✦</h3>
+        <h3 style="color: var(--gold);">✦ Tu selección ✦</h3>
         <button id="closeCartBtn" style="background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer;">✕</button>
     </div>
     <div id="cartItems"></div>
@@ -463,11 +503,11 @@
 
 <main>
     <section id="inicio" class="hero-section">
-        <img class="hero-image" src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Adriano de la Rioja">
+        <img class="hero-image" src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Adriano de la Rioja" onerror="this.src='https://picsum.photos/1920/1080'">
         <div class="hero-overlay">
             <div class="container">
                 <div class="hero-credit">Obispo #508 · El taller · Desde 2020</div>
-                <h1 style="font-family: 'Cormorant Garamond', serif; font-size: 3rem; margin-top: 1rem;">Vestir con oficio</h1>
+                <h1>Vestir con oficio,<br>durar sin prisa</h1>
             </div>
         </div>
     </section>
@@ -488,7 +528,7 @@
 
         <!-- Product Grid -->
         <div id="productGrid" class="product-grid">
-            <div class="loading">Cargando productos...</div>
+            <div class="loading">✨ Cargando productos...</div>
         </div>
 
         <div id="contacto" class="section-title reveal">
@@ -496,7 +536,7 @@
             <div class="gold-divider"></div>
         </div>
 
-        <div class="social-connect" style="text-align: center; margin-bottom: 3rem;">
+        <div style="text-align: center; margin-bottom: 3rem;">
             <a href="https://www.instagram.com/adrianodelarioja" target="_blank" class="social-btn">📷 Instagram</a>
             <a href="https://wa.me/5350979465" target="_blank" class="social-btn">💬 WhatsApp</a>
         </div>
@@ -512,271 +552,368 @@
 <button class="back-to-top" id="backToTop">↑</button>
 
 <script>
-// ============================================
-// CONFIGURACIÓN SUPABASE
-// ============================================
-const SUPABASE_URL = '__SUPABASE_URL__';
-const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ============================================
-// ESTADO GLOBAL
-// ============================================
-let currentUser = null;
-let allProducts = [];
-let cart = [];
-let currentFilter = 'all';
-
-// ============================================
-// FUNCIONES DE PRODUCTOS
-// ============================================
-async function loadProducts() {
-    const container = document.getElementById('productGrid');
-    container.innerHTML = '<div class="loading">Cargando productos...</div>';
+(function() {
+    // ============================================
+    // CONFIGURACIÓN SUPABASE
+    // ============================================
+    const SUPABASE_URL = '__SUPABASE_URL__';
+    const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
     
-    const { data, error } = await supabase.from('products').select('*');
+    console.log('🚀 Iniciando aplicación...');
+    console.log('📦 Conectando a Supabase...');
     
-    if (error) {
-        container.innerHTML = `<div class="loading">Error: ${error.message}</div>`;
-        return;
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // ============================================
+    // ESTADO GLOBAL
+    // ============================================
+    let currentUser = null;
+    let allProducts = [];
+    let cart = [];
+    let currentFilter = 'all';
+    
+    // ============================================
+    // FUNCIONES DE PRODUCTOS
+    // ============================================
+    async function loadProducts() {
+        console.log('📦 Cargando productos...');
+        const container = document.getElementById('productGrid');
+        if (!container) {
+            console.error('❌ No se encuentra el contenedor productGrid');
+            return;
+        }
+        
+        container.innerHTML = '<div class="loading">✨ Cargando productos...</div>';
+        
+        try {
+            const { data, error } = await supabaseClient.from('products').select('*');
+            
+            if (error) {
+                console.error('❌ Error de Supabase:', error);
+                container.innerHTML = `<div class="loading">❌ Error: ${error.message}</div>`;
+                return;
+            }
+            
+            if (!data || data.length === 0) {
+                console.warn('⚠️ No hay productos');
+                container.innerHTML = '<div class="loading">✨ Próximamente nuevas colecciones ✨</div>';
+                return;
+            }
+            
+            allProducts = data;
+            console.log(`✅ ${allProducts.length} productos cargados`);
+            renderProducts();
+            
+        } catch (err) {
+            console.error('❌ Error:', err);
+            container.innerHTML = '<div class="loading">❌ Error al cargar productos</div>';
+        }
     }
     
-    if (!data || data.length === 0) {
-        container.innerHTML = '<div class="loading">No hay productos disponibles</div>';
-        return;
-    }
-    
-    allProducts = data;
-    renderProducts();
-}
-
-function renderProducts() {
-    const filtered = currentFilter === 'all' 
-        ? allProducts 
-        : allProducts.filter(p => p.category === currentFilter);
-    
-    const container = document.getElementById('productGrid');
-    
-    if (filtered.length === 0) {
-        container.innerHTML = '<div class="loading">No hay productos en esta categoría</div>';
-        return;
-    }
-    
-    container.innerHTML = filtered.map(p => `
-        <div class="product-card">
-            <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
-            <div class="product-info">
-                <div class="product-name">${p.name}</div>
-                <div class="product-price">€${p.price}</div>
-                <button class="product-btn" onclick="addToCart(${p.id}, '${p.name}', ${p.price}, '${p.image_url}')">
-                    Añadir al carrito
-                </button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function filterProducts(category) {
-    currentFilter = category;
-    renderProducts();
-}
-
-// ============================================
-// FUNCIONES DE CARRITO
-// ============================================
-async function loadCart() {
-    if (!currentUser) {
-        cart = [];
-        updateCartUI();
-        return;
-    }
-    
-    const { data } = await supabase
-        .from('cart')
-        .select('id, product_id, products(*)')
-        .eq('user_id', currentUser.id);
-    
-    cart = data || [];
-    updateCartUI();
-    document.getElementById('cartCount').textContent = cart.length;
-}
-
-async function addToCart(productId, productName, productPrice, productImage) {
-    if (!currentUser) {
-        alert('Inicia sesión primero');
-        document.getElementById('loginModal').classList.add('active');
-        return;
-    }
-    
-    const exists = cart.find(i => i.product_id === productId);
-    if (exists) {
-        alert('Producto ya está en el carrito');
-        return;
-    }
-    
-    const { error } = await supabase
-        .from('cart')
-        .insert({ user_id: currentUser.id, product_id: productId });
-    
-    if (!error) {
-        await loadCart();
-        alert(`✨ ${productName} añadido al carrito`);
-    } else {
-        alert('Error al añadir');
-    }
-}
-
-async function removeFromCart(cartId, productName) {
-    await supabase.from('cart').delete().eq('id', cartId);
-    await loadCart();
-    alert(`${productName} eliminado`);
-}
-
-function updateCartUI() {
-    const container = document.getElementById('cartItems');
-    const totalSpan = document.getElementById('cartTotal');
-    
-    if (!cart.length) {
-        container.innerHTML = '<div style="text-align: center; padding: 2rem;">✨ Carrito vacío ✨</div>';
-        totalSpan.textContent = '€0';
-        return;
-    }
-    
-    let total = 0;
-    container.innerHTML = cart.map(item => {
-        const p = item.products;
-        total += p.price;
-        return `
-            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(212,175,55,0.1);">
-                <img src="${p.image_url}" style="width: 60px; height: 80px; object-fit: cover; border-radius: 8px;">
-                <div style="flex: 1;">
-                    <div style="font-weight: 500;">${p.name}</div>
-                    <div style="color: var(--gold);">€${p.price}</div>
+    function renderProducts() {
+        const filtered = currentFilter === 'all' 
+            ? allProducts 
+            : allProducts.filter(p => p.category === currentFilter);
+        
+        const container = document.getElementById('productGrid');
+        if (!container) return;
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="loading">✨ No hay productos en esta categoría ✨</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(p => `
+            <div class="product-card">
+                <img src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.src='https://picsum.photos/300/400'">
+                <div class="product-info">
+                    <div class="product-name">${escapeHtml(p.name)}</div>
+                    <div class="product-price">€${p.price}</div>
+                    <button class="product-btn" onclick="window.addToCartHandler(${p.id}, '${escapeHtml(p.name)}', ${p.price}, '${p.image_url}')">
+                        Añadir al carrito
+                    </button>
                 </div>
-                <button onclick="removeFromCart(${item.id}, '${p.name}')" style="background: none; border: none; color: #888; cursor: pointer;">🗑️</button>
             </div>
-        `;
-    }).join('');
-    totalSpan.textContent = `€${total}`;
-}
-
-// ============================================
-// FUNCIONES DE LOGIN
-// ============================================
-async function login(name, phone) {
-    if (!name || !phone) {
-        alert('Completa todos los campos');
-        return null;
+        `).join('');
     }
     
-    const userId = `${phone}_${Date.now()}`;
-    const user = { id: userId, name: name, phone: phone };
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
     
-    localStorage.setItem('adriano_user', JSON.stringify(user));
-    await supabase.from('users').upsert({ id: userId, name: name, phone: phone });
+    function filterProducts(category) {
+        currentFilter = category;
+        renderProducts();
+    }
     
-    currentUser = user;
-    document.getElementById('userNameDisplay').textContent = `✦ ${name}`;
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'flex';
-    document.getElementById('loginModal').classList.remove('active');
+    // ============================================
+    // FUNCIONES DE CARRITO
+    // ============================================
+    async function loadCart() {
+        if (!currentUser) {
+            cart = [];
+            updateCartUI();
+            return;
+        }
+        
+        try {
+            const { data } = await supabaseClient
+                .from('cart')
+                .select('id, product_id, products(*)')
+                .eq('user_id', currentUser.id);
+            
+            cart = data || [];
+            updateCartUI();
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) cartCount.textContent = cart.length;
+        } catch (err) {
+            console.error('Error loading cart:', err);
+        }
+    }
     
-    await loadCart();
-    return user;
-}
-
-function logout() {
-    currentUser = null;
-    localStorage.removeItem('adriano_user');
-    document.getElementById('userNameDisplay').textContent = '';
-    document.getElementById('loginBtn').style.display = 'flex';
-    document.getElementById('logoutBtn').style.display = 'none';
-    loadCart();
-    alert('Sesión cerrada');
-}
-
-function loadSession() {
-    const saved = localStorage.getItem('adriano_user');
-    if (saved) {
-        currentUser = JSON.parse(saved);
-        document.getElementById('userNameDisplay').textContent = `✦ ${currentUser.name}`;
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'flex';
+    window.addToCartHandler = async function(productId, productName, productPrice, productImage) {
+        console.log('➕ Añadiendo:', productName);
+        
+        if (!currentUser) {
+            alert('Inicia sesión primero');
+            document.getElementById('loginModal').classList.add('active');
+            return;
+        }
+        
+        const exists = cart.find(i => i.product_id === productId);
+        if (exists) {
+            alert('Producto ya está en el carrito');
+            return;
+        }
+        
+        const { error } = await supabaseClient
+            .from('cart')
+            .insert({ user_id: currentUser.id, product_id: productId });
+        
+        if (!error) {
+            await loadCart();
+            alert(`✨ ${productName} añadido al carrito`);
+        } else {
+            alert('Error al añadir');
+            console.error(error);
+        }
+    };
+    
+    window.removeFromCartHandler = async function(cartId, productName) {
+        await supabaseClient.from('cart').delete().eq('id', cartId);
+        await loadCart();
+        alert(`${productName} eliminado`);
+    };
+    
+    function updateCartUI() {
+        const container = document.getElementById('cartItems');
+        const totalSpan = document.getElementById('cartTotal');
+        
+        if (!container) return;
+        
+        if (!cart.length) {
+            container.innerHTML = '<div style="text-align: center; padding: 2rem;">✨ Carrito vacío ✨</div>';
+            if (totalSpan) totalSpan.textContent = '€0';
+            return;
+        }
+        
+        let total = 0;
+        container.innerHTML = cart.map(item => {
+            const p = item.products;
+            if (p) total += p.price;
+            return `
+                <div class="cart-item">
+                    <img class="cart-item-img" src="${p?.image_url || ''}" onerror="this.src='https://picsum.photos/60/80'">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500;">${p?.name || 'Producto'}</div>
+                        <div style="color: var(--gold);">€${p?.price || 0}</div>
+                    </div>
+                    <button onclick="window.removeFromCartHandler(${item.id}, '${p?.name || ''}')" style="background: none; border: none; color: #888; cursor: pointer;">🗑️</button>
+                </div>
+            `;
+        }).join('');
+        if (totalSpan) totalSpan.textContent = `€${total}`;
+    }
+    
+    // ============================================
+    // FUNCIONES DE LOGIN
+    // ============================================
+    async function login(name, phone) {
+        if (!name || !phone) {
+            alert('Completa todos los campos');
+            return null;
+        }
+        
+        const userId = `${phone}_${Date.now()}`;
+        const user = { id: userId, name: name, phone: phone };
+        
+        localStorage.setItem('adriano_user', JSON.stringify(user));
+        
+        try {
+            await supabaseClient.from('users').upsert({ id: userId, name: name, phone: phone });
+        } catch (err) {
+            console.warn('Error guardando en Supabase:', err);
+        }
+        
+        currentUser = user;
+        
+        const userNameSpan = document.getElementById('userNameDisplay');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (userNameSpan) userNameSpan.textContent = `✦ ${name}`;
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'flex';
+        
+        document.getElementById('loginModal').classList.remove('active');
+        await loadCart();
+        
+        return user;
+    }
+    
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('adriano_user');
+        
+        const userNameSpan = document.getElementById('userNameDisplay');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (userNameSpan) userNameSpan.textContent = '';
+        if (loginBtn) loginBtn.style.display = 'flex';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        
         loadCart();
-    }
-}
-
-// ============================================
-// WHATSAPP
-// ============================================
-function sendWhatsAppOrder() {
-    if (!cart.length) {
-        alert('Agrega productos al carrito primero');
-        return;
+        alert('Sesión cerrada');
     }
     
-    const items = cart.map(item => `• ${item.products.name} - €${item.products.price}`).join('%0A');
-    const total = cart.reduce((sum, item) => sum + item.products.price, 0);
-    const userName = currentUser ? currentUser.name : 'Cliente';
-    const userPhone = currentUser ? currentUser.phone : 'No registrado';
+    function loadSession() {
+        const saved = localStorage.getItem('adriano_user');
+        if (saved) {
+            try {
+                currentUser = JSON.parse(saved);
+                const userNameSpan = document.getElementById('userNameDisplay');
+                const loginBtn = document.getElementById('loginBtn');
+                const logoutBtn = document.getElementById('logoutBtn');
+                
+                if (userNameSpan) userNameSpan.textContent = `✦ ${currentUser.name}`;
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'flex';
+                
+                loadCart();
+            } catch (e) {
+                console.error('Error parsing user:', e);
+            }
+        }
+    }
     
-    const message = `✨ PEDIDO - ADRIANO DE LA RIOJA ✨%0A%0A👤 Cliente: ${userName}%0A📱 WhatsApp: ${userPhone}%0A%0A📦 PRODUCTOS:%0A${items}%0A%0A💰 TOTAL: €${total}`;
+    // ============================================
+    // WHATSAPP
+    // ============================================
+    function sendWhatsAppOrder() {
+        if (!cart.length) {
+            alert('Agrega productos al carrito primero');
+            return;
+        }
+        
+        const items = cart.map(item => `• ${item.products?.name || 'Producto'} - €${item.products?.price || 0}`).join('%0A');
+        const total = cart.reduce((sum, item) => sum + (item.products?.price || 0), 0);
+        const userName = currentUser ? currentUser.name : 'Cliente';
+        const userPhone = currentUser ? currentUser.phone : 'No registrado';
+        
+        const message = `✨ PEDIDO - ADRIANO DE LA RIOJA ✨%0A%0A👤 Cliente: ${userName}%0A📱 WhatsApp: ${userPhone}%0A%0A📦 PRODUCTOS:%0A${items}%0A%0A💰 TOTAL: €${total}%0A%0A📍 Retiro: Obispo #508, La Habana Vieja`;
+        
+        window.open(`https://wa.me/5350979465?text=${message}`, '_blank');
+    }
     
-    window.open(`https://wa.me/5350979465?text=${message}`, '_blank');
-}
-
-// ============================================
-// INICIALIZACIÓN
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-    loadSession();
-    
-    // Event Listeners
-    document.getElementById('loginBtn').onclick = () => document.getElementById('loginModal').classList.add('active');
-    document.getElementById('logoutBtn').onclick = logout;
-    document.getElementById('submitLoginBtn').onclick = async () => {
-        const name = document.getElementById('loginName').value;
-        const phone = document.getElementById('loginPhone').value;
-        await login(name, phone);
-    };
-    
-    document.getElementById('cartBtn').onclick = () => document.getElementById('cartSidebar').classList.add('open');
-    document.getElementById('closeCartBtn').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
-    document.getElementById('whatsappBtn').onclick = sendWhatsAppOrder;
-    
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.onclick = () => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filterProducts(btn.dataset.filter);
-        };
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 DOM cargado, inicializando...');
+        
+        loadProducts();
+        loadSession();
+        
+        // Event Listeners
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const submitLoginBtn = document.getElementById('submitLoginBtn');
+        const cartBtn = document.getElementById('cartBtn');
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        const menuIcon = document.getElementById('menuIcon');
+        const navLinks = document.getElementById('navLinks');
+        const backToTop = document.getElementById('backToTop');
+        
+        if (loginBtn) {
+            loginBtn.onclick = () => document.getElementById('loginModal').classList.add('active');
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.onclick = logout;
+        }
+        
+        if (submitLoginBtn) {
+            submitLoginBtn.onclick = async () => {
+                const name = document.getElementById('loginName').value;
+                const phone = document.getElementById('loginPhone').value;
+                await login(name, phone);
+            };
+        }
+        
+        if (cartBtn) {
+            cartBtn.onclick = () => document.getElementById('cartSidebar').classList.add('open');
+        }
+        
+        if (closeCartBtn) {
+            closeCartBtn.onclick = () => document.getElementById('cartSidebar').classList.remove('open');
+        }
+        
+        if (whatsappBtn) {
+            whatsappBtn.onclick = sendWhatsAppOrder;
+        }
+        
+        if (menuIcon && navLinks) {
+            menuIcon.onclick = () => navLinks.classList.toggle('active');
+        }
+        
+        if (backToTop) {
+            backToTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Filtros
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterProducts(btn.dataset.filter);
+            };
+        });
+        
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => e.isIntersecting && e.target.classList.add('visible'));
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        
+        // Back to top visibility
+        window.addEventListener('scroll', () => {
+            if (backToTop) {
+                if (window.scrollY > 300) backToTop.classList.add('visible');
+                else backToTop.classList.remove('visible');
+            }
+        });
+        
+        console.log('✅ Aplicación inicializada correctamente');
     });
-    
-    document.getElementById('menuIcon').onclick = () => {
-        const nav = document.getElementById('navLinks');
-        nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-    };
-    
-    // Scroll reveal
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => e.isIntersecting && e.target.classList.add('visible'));
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    
-    // Back to top
-    window.addEventListener('scroll', () => {
-        const btn = document.getElementById('backToTop');
-        if (window.scrollY > 300) btn.classList.add('visible');
-        else btn.classList.remove('visible');
-    });
-    document.getElementById('backToTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Hero image
-    const heroImg = document.querySelector('.hero-image');
-    if (heroImg && heroImg.complete) heroImg.style.opacity = '1';
-});
+})();
 </script>
 
 </body>
