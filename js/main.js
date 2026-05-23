@@ -1,5 +1,5 @@
 // js/main.js
-import { checkConnection } from './supabase-client.js';
+import { supabase, checkConnection } from './supabase-client.js';
 import { login, logout, loadSession, getCurrentUser } from './auth.js';
 import { loadCart, addToCart, removeFromCart, getCart } from './cart.js';
 import { showSimpleNotification } from './ui.js';
@@ -17,20 +17,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Verificar conexión
   const isConnected = await checkConnection();
   if (!isConnected) {
+    console.warn('⚠️ Problemas de conexión');
     showSimpleNotification('⚠️ Problemas de conexión', 'error');
   }
   
-  // Cargar sesión
+  // Cargar sesión guardada
   const savedUser = loadSession();
   if (savedUser) {
-    document.getElementById('userNameDisplay').textContent = `✦ ${savedUser.name}`;
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'flex';
+    const userNameSpan = document.getElementById('userNameDisplay');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (userNameSpan) userNameSpan.textContent = `✦ ${savedUser.name}`;
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'flex';
     await loadCart();
   }
   
   // Configurar eventos
   setupEventListeners();
+  
+  // Cargar productos (necesitas implementar esta función si no existe)
+  if (typeof loadProducts === 'function') {
+    await loadProducts();
+  } else {
+    console.warn('⚠️ loadProducts no está definida');
+  }
   
   // Hero image
   const heroImg = document.getElementById('heroImage');
@@ -58,70 +70,104 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupEventListeners() {
   // Login
   const modal = document.getElementById('loginModal');
-  document.getElementById('loginBtn').onclick = () => modal?.classList.add('active');
-  document.getElementById('logoutBtn').onclick = () => {
-    logout();
-    location.reload();
-  };
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const submitLoginBtn = document.getElementById('submitLoginBtn');
   
-  document.getElementById('submitLoginBtn').onclick = async () => {
-    const name = document.getElementById('loginName')?.value.trim();
-    const phone = document.getElementById('loginPhone')?.value.trim();
-    
-    if (!name || !phone) {
-      showSimpleNotification('Completa todos los campos', 'error');
-      return;
-    }
-    
-    try {
-      const user = await login(name, phone);
-      if (user) {
-        modal?.classList.remove('active');
-        document.getElementById('userNameDisplay').textContent = `✦ ${user.name}`;
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'flex';
-        await loadCart();
-        showSimpleNotification(`✨ Bienvenido, ${name} ✨`, 'success');
+  if (loginBtn) {
+    loginBtn.onclick = () => {
+      if (modal) modal.classList.add('active');
+    };
+  }
+  
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      logout();
+      location.reload();
+    };
+  }
+  
+  if (submitLoginBtn) {
+    submitLoginBtn.onclick = async () => {
+      const name = document.getElementById('loginName')?.value.trim();
+      const phone = document.getElementById('loginPhone')?.value.trim();
+      
+      if (!name || !phone) {
+        showSimpleNotification('Completa todos los campos', 'error');
+        return;
       }
-    } catch (error) {
-      showSimpleNotification(error.message, 'error');
-    }
-  };
+      
+      try {
+        const user = await login(name, phone);
+        if (user) {
+          if (modal) modal.classList.remove('active');
+          const userNameSpan = document.getElementById('userNameDisplay');
+          const loginBtnElem = document.getElementById('loginBtn');
+          const logoutBtnElem = document.getElementById('logoutBtn');
+          
+          if (userNameSpan) userNameSpan.textContent = `✦ ${user.name}`;
+          if (loginBtnElem) loginBtnElem.style.display = 'none';
+          if (logoutBtnElem) logoutBtnElem.style.display = 'flex';
+          await loadCart();
+          showSimpleNotification(`✨ Bienvenido, ${name} ✨`, 'success');
+        }
+      } catch (error) {
+        showSimpleNotification(error.message, 'error');
+      }
+    };
+  }
   
   // Carrito
-  document.getElementById('cartBtn').onclick = () => {
-    document.getElementById('cartSidebar')?.classList.add('open');
-  };
-  document.getElementById('closeCartBtn').onclick = () => {
-    document.getElementById('cartSidebar')?.classList.remove('open');
-  };
+  const cartBtn = document.getElementById('cartBtn');
+  const closeCartBtn = document.getElementById('closeCartBtn');
+  const cartSidebar = document.getElementById('cartSidebar');
+  
+  if (cartBtn) {
+    cartBtn.onclick = () => {
+      if (cartSidebar) cartSidebar.classList.add('open');
+    };
+  }
+  
+  if (closeCartBtn) {
+    closeCartBtn.onclick = () => {
+      if (cartSidebar) cartSidebar.classList.remove('open');
+    };
+  }
   
   // WhatsApp
-  document.getElementById('whatsappBtn').onclick = () => {
-    const cart = getCart();
-    if (!cart.length) {
-      showSimpleNotification('⚠️ Agrega productos al carrito', 'error');
-      return;
-    }
-    
-    const user = getCurrentUser();
-    const items = cart.map(item => `• ${item.products?.name} - €${item.products?.price}`).join('%0A');
-    const total = cart.reduce((sum, item) => sum + (item.products?.price || 0), 0);
-    const userName = user ? user.name : 'Cliente';
-    const userPhone = user ? user.phone : 'No registrado';
-    
-    const message = `✨ *PEDIDO - ADRIANO DE LA RIOJA* ✨%0A%0A👤 *Cliente:* ${userName}%0A📱 *WhatsApp:* ${userPhone}%0A%0A📦 *PRODUCTOS:*%0A${items}%0A%0A💰 *TOTAL:* €${total}%0A%0A📍 *Retiro:* Obispo #508, La Habana Vieja`;
-    
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-  };
+  const whatsappBtn = document.getElementById('whatsappBtn');
+  if (whatsappBtn) {
+    whatsappBtn.onclick = () => {
+      const cart = getCart();
+      if (!cart.length) {
+        showSimpleNotification('⚠️ Agrega productos al carrito', 'error');
+        return;
+      }
+      
+      const user = getCurrentUser();
+      const items = cart.map(item => `• ${item.products?.name} - €${item.products?.price}`).join('%0A');
+      const total = cart.reduce((sum, item) => sum + (item.products?.price || 0), 0);
+      const userName = user ? user.name : 'Cliente';
+      const userPhone = user ? user.phone : 'No registrado';
+      
+      const message = `✨ *PEDIDO - ADRIANO DE LA RIOJA* ✨%0A%0A👤 *Cliente:* ${userName}%0A📱 *WhatsApp:* ${userPhone}%0A%0A📦 *PRODUCTOS:*%0A${items}%0A%0A💰 *TOTAL:* €${total}%0A%0A📍 *Retiro:* Obispo #508, La Habana Vieja`;
+      
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+    };
+  }
   
   // Back to top
-  document.getElementById('backToTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const backToTop = document.getElementById('backToTop');
+  if (backToTop) {
+    backToTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   
   // Menú móvil
-  document.getElementById('menuIcon').onclick = () => {
-    document.getElementById('navLinks')?.classList.toggle('active');
-  };
+  const menuIcon = document.getElementById('menuIcon');
+  const navLinks = document.getElementById('navLinks');
+  if (menuIcon && navLinks) {
+    menuIcon.onclick = () => navLinks.classList.toggle('active');
+  }
   
   // Scroll header
   window.addEventListener('scroll', () => {
