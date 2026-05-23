@@ -58,6 +58,7 @@ export async function login(name, phone) {
     }
     
     currentUser = user;
+    console.log('✅ Login exitoso:', cleanName);
     return user;
     
   } catch (error) {
@@ -70,6 +71,7 @@ export async function login(name, phone) {
 export function logout() {
   currentUser = null;
   localStorage.removeItem('adriano_user');
+  console.log('👋 Sesión cerrada');
 }
 
 // Cargar sesión guardada
@@ -78,6 +80,7 @@ export function loadSession() {
     const saved = localStorage.getItem('adriano_user');
     if (saved) {
       currentUser = JSON.parse(saved);
+      console.log('🔄 Sesión cargada:', currentUser.name);
       return currentUser;
     }
   } catch (error) {
