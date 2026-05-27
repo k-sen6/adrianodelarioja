@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Inject Config
 
 on:
   push:
@@ -6,57 +6,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  inject:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Create config file with secrets
+      - name: Create config file
         run: |
-          # Crear archivo config.js con las variables de entorno
           cat > config.js << 'EOF'
-          // Archivo generado automáticamente por GitHub Actions
-          // NO EDITAR MANUALMENTE - Los cambios se perderán
-          
           window.__APP_CONFIG__ = {
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
             supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
-            whatsappNumber: '5350979465',
-            storeAddress: 'Obispo #508, La Habana Vieja',
-            buildDate: '${{ github.event.repository.updated_at }}',
-            buildRun: '${{ github.run_id }}'
+            buildRun: '${{ github.run_id }}',
+            buildDate: '${{ github.event.repository.updated_at }}'
           };
-          
           console.log('✅ Configuración cargada desde build time');
           EOF
           
-          echo "✅ config.js creado correctamente"
-          
-          # Mostrar preview (sin mostrar secretos)
-          echo "Preview de config.js:"
-          head -10 config.js
+          echo "✅ config.js creado"
+          cat config.js
       
-      - name: Inject config into index.html
+      - name: Commit and push config file
         run: |
-          # Verificar que config.js se creó
-          if [ -f config.js ]; then
-            echo "✅ config.js existe"
-            # Añadir la referencia a config.js antes de </body>
-            sed -i '/<\/body>/i <script src="config.js"></script>' index.html
-            echo "✅ Config inyectada en index.html"
-          else
-            echo "❌ config.js no se creó"
-            exit 1
-          fi
-      
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Deploy from ${{ github.sha }}'
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.js
+          git diff --staged --quiet || git commit -m "chore: update config.js [skip ci]"
+          git push
