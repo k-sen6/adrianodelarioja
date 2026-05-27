@@ -1,0 +1,62 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Create config file with secrets
+        run: |
+          # Crear archivo config.js con las variables de entorno
+          cat > config.js << 'EOF'
+          // Archivo generado automáticamente por GitHub Actions
+          // NO EDITAR MANUALMENTE - Los cambios se perderán
+          
+          window.__APP_CONFIG__ = {
+            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
+            supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
+            whatsappNumber: '5350979465',
+            storeAddress: 'Obispo #508, La Habana Vieja',
+            buildDate: '${{ github.event.repository.updated_at }}',
+            buildRun: '${{ github.run_id }}'
+          };
+          
+          console.log('✅ Configuración cargada desde build time');
+          EOF
+          
+          echo "✅ config.js creado correctamente"
+          
+          # Mostrar preview (sin mostrar secretos)
+          echo "Preview de config.js:"
+          head -10 config.js
+      
+      - name: Inject config into index.html
+        run: |
+          # Verificar que config.js se creó
+          if [ -f config.js ]; then
+            echo "✅ config.js existe"
+            # Añadir la referencia a config.js antes de </body>
+            sed -i '/<\/body>/i <script src="config.js"></script>' index.html
+            echo "✅ Config inyectada en index.html"
+          else
+            echo "❌ config.js no se creó"
+            exit 1
+          fi
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy from ${{ github.sha }}'
