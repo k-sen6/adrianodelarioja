@@ -3,28 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración · Adriano de la Rioja</title>
+    <title>Panel Admin · Adriano de la Rioja</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: #0A0A0A;
             color: #EAEAEA;
             padding: 2rem;
         }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
             display: flex;
             justify-content: space-between;
@@ -33,12 +23,7 @@
             padding-bottom: 1rem;
             border-bottom: 2px solid #D4AF37;
         }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            color: #D4AF37;
-        }
-        
+        .header h1 { font-size: 1.5rem; color: #D4AF37; }
         .logout-btn {
             background: #D4AF37;
             color: #050505;
@@ -48,10 +33,7 @@
             cursor: pointer;
             font-weight: 500;
         }
-        
-        .logout-btn:hover {
-            background: #E8D174;
-        }
+        .logout-btn:hover { background: #E8D174; }
         
         .login-panel {
             display: flex;
@@ -60,7 +42,6 @@
             min-height: 100vh;
             margin: -2rem;
         }
-        
         .login-card {
             background: #1A1A1A;
             padding: 2rem;
@@ -69,13 +50,7 @@
             width: 100%;
             max-width: 400px;
         }
-        
-        .login-card h2 {
-            color: #D4AF37;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        
+        .login-card h2 { color: #D4AF37; margin-bottom: 1.5rem; text-align: center; }
         .login-card input {
             width: 100%;
             padding: 0.8rem;
@@ -86,12 +61,7 @@
             color: white;
             font-size: 1rem;
         }
-        
-        .login-card input:focus {
-            outline: none;
-            border-color: #D4AF37;
-        }
-        
+        .login-card input:focus { outline: none; border-color: #D4AF37; }
         .login-card button {
             width: 100%;
             padding: 0.8rem;
@@ -103,29 +73,16 @@
             cursor: pointer;
             font-size: 1rem;
         }
+        .login-card button:hover { background: #E8D174; }
+        .error-msg { color: #ff6b6b; text-align: center; margin-top: 1rem; font-size: 0.8rem; }
         
-        .login-card button:hover {
-            background: #E8D174;
-        }
-        
-        .error-msg {
-            color: #ff6b6b;
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-        }
-        
-        .admin-content {
-            display: none;
-        }
-        
+        .admin-content { display: none; }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
-        
         .stat-card {
             background: #1A1A1A;
             padding: 1.5rem;
@@ -133,19 +90,8 @@
             text-align: center;
             border: 1px solid #333;
         }
-        
-        .stat-card h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #888;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-card .number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #D4AF37;
-        }
+        .stat-card h3 { font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem; }
+        .stat-card .number { font-size: 2.5rem; font-weight: 700; color: #D4AF37; }
         
         .form-section {
             background: #1A1A1A;
@@ -154,24 +100,9 @@
             margin-bottom: 2rem;
             border: 1px solid #333;
         }
-        
-        .form-section h2 {
-            color: #D4AF37;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-size: 0.8rem;
-            color: #AAA;
-        }
-        
+        .form-section h2 { color: #D4AF37; margin-bottom: 1rem; font-size: 1.2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.8rem; color: #AAA; }
         .form-group input, .form-group select {
             width: 100%;
             padding: 0.7rem;
@@ -181,18 +112,8 @@
             color: white;
             font-size: 0.9rem;
         }
-        
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #D4AF37;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #D4AF37; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .btn-primary {
             background: #D4AF37;
             color: #050505;
@@ -203,11 +124,7 @@
             font-weight: 600;
             margin-top: 0.5rem;
         }
-        
-        .btn-primary:hover {
-            background: #E8D174;
-        }
-        
+        .btn-primary:hover { background: #E8D174; }
         .btn-danger {
             background: #dc2626;
             color: white;
@@ -217,11 +134,7 @@
             cursor: pointer;
             font-size: 0.7rem;
         }
-        
-        .btn-danger:hover {
-            background: #ef4444;
-        }
-        
+        .btn-danger:hover { background: #ef4444; }
         .btn-edit {
             background: #3b82f6;
             color: white;
@@ -232,40 +145,12 @@
             font-size: 0.7rem;
             margin-right: 0.5rem;
         }
-        
-        .btn-edit:hover {
-            background: #60a5fa;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            background: #1A1A1A;
-            border-radius: 12px;
-            padding: 1rem;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid #333;
-        }
-        
-        th {
-            color: #D4AF37;
-            font-weight: 600;
-        }
-        
-        .product-image {
-            width: 50px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
+        .btn-edit:hover { background: #60a5fa; }
+        .table-container { overflow-x: auto; background: #1A1A1A; border-radius: 12px; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #333; }
+        th { color: #D4AF37; font-weight: 600; }
+        .product-image { width: 50px; height: 60px; object-fit: cover; border-radius: 6px; }
         
         .notification {
             position: fixed;
@@ -280,38 +165,30 @@
             transform: translateX(400px);
             transition: transform 0.3s;
         }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.error {
-            background: #dc2626;
-            color: white;
-        }
+        .notification.show { transform: translateX(0); }
+        .notification.error { background: #dc2626; color: white; }
         
         @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+            body { padding: 1rem; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
 <div class="container" id="app">
+    <!-- Panel de Login (usando Supabase Auth) -->
     <div id="loginPanel" class="login-panel">
         <div class="login-card">
             <h2>🔐 Acceso Administrador</h2>
-            <input type="password" id="adminPassword" placeholder="Contraseña de administrador">
+            <input type="email" id="adminEmail" placeholder="Email" value="admin@adrianodelarioja.com">
+            <input type="password" id="adminPassword" placeholder="Contraseña">
             <button id="loginBtn">Ingresar</button>
             <div id="loginError" class="error-msg"></div>
         </div>
     </div>
 
+    <!-- Panel de Administración (visible solo tras login exitoso) -->
     <div id="adminContent" class="admin-content">
         <div class="header">
             <h1>✦ Panel de Administración ✦</h1>
@@ -319,45 +196,23 @@
         </div>
 
         <div class="stats">
-            <div class="stat-card">
-                <h3>Total Productos</h3>
-                <div class="number" id="totalProducts">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Pedidos Pendientes</h3>
-                <div class="number" id="totalCarts">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Usuarios Registrados</h3>
-                <div class="number" id="totalUsers">0</div>
-            </div>
+            <div class="stat-card"><h3>Total Productos</h3><div class="number" id="totalProducts">0</div></div>
+            <div class="stat-card"><h3>Pedidos Pendientes</h3><div class="number" id="totalCarts">0</div></div>
+            <div class="stat-card"><h3>Usuarios Registrados</h3><div class="number" id="totalUsers">0</div></div>
         </div>
 
         <div class="form-section">
             <h2>➕ Añadir Nuevo Producto</h2>
             <div class="form-row">
-                <div class="form-group">
-                    <label>Nombre del producto</label>
-                    <input type="text" id="prodName" placeholder="Ej: Vestido de Gala">
-                </div>
-                <div class="form-group">
-                    <label>Precio (€)</label>
-                    <input type="number" id="prodPrice" placeholder="Ej: 299">
-                </div>
+                <div class="form-group"><label>Nombre</label><input type="text" id="prodName" placeholder="Ej: Vestido de Gala"></div>
+                <div class="form-group"><label>Precio (€)</label><input type="number" id="prodPrice" placeholder="Ej: 299"></div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Categoría</label>
-                    <select id="prodCategory">
-                        <option value="vestidos">Vestidos</option>
-                        <option value="chaquetas">Chaquetas</option>
-                        <option value="calzado">Calzado</option>
-                    </select>
+                    <select id="prodCategory"><option value="vestidos">Vestidos</option><option value="chaquetas">Chaquetas</option><option value="calzado">Calzado</option></select>
                 </div>
-                <div class="form-group">
-                    <label>URL de la imagen</label>
-                    <input type="text" id="prodImage" placeholder="https://i.postimg.cc/...">
-                </div>
+                <div class="form-group"><label>URL Imagen</label><input type="text" id="prodImage" placeholder="https://i.postimg.cc/..."></div>
             </div>
             <button class="btn-primary" id="addProductBtn">✨ Añadir Producto</button>
         </div>
@@ -365,10 +220,8 @@
         <div class="form-section">
             <h2>📋 Lista de Productos</h2>
             <div class="table-container">
-                <table id="productsTable">
-                    <thead>
-                        <tr><th>Imagen</th><th>ID</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Acciones</th></tr>
-                    </thead>
+                <table>
+                    <thead><tr><th>Imagen</th><th>ID</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Acciones</th></tr></thead>
                     <tbody id="productsList"></tbody>
                 </table>
             </div>
@@ -377,10 +230,8 @@
         <div class="form-section">
             <h2>📦 Pedidos Recientes</h2>
             <div class="table-container">
-                <table id="cartsTable">
-                    <thead>
-                        <tr><th>Usuario</th><th>Teléfono</th><th>Productos</th><th>Total</th><th>Fecha</th></tr>
-                    </thead>
+                <table>
+                    <thead><tr><th>Usuario</th><th>Teléfono</th><th>Productos</th><th>Total</th><th>Fecha</th></tr></thead>
                     <tbody id="cartsList"></tbody>
                 </table>
             </div>
@@ -391,221 +242,183 @@
 <div id="notification" class="notification"></div>
 
 <script>
-// ============================================
-// CONFIGURACIÓN - SIN REDECLARAR supabase
-// ============================================
-// ✅ USAMOS window.supabase (NO declaramos const supabase)
-const SUPABASE_URL = '__SUPABASE_URL__';
-const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
+    // ============================================
+    // CONFIGURACIÓN SUPABASE
+    // ============================================
+    const SUPABASE_URL = '__SUPABASE_URL__';
+    const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
+    
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentSession = null;
 
-// ✅ CLIENTE con nombre diferente (NO 'supabase')
-const sbAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ============================================
+    // FUNCIONES
+    // ============================================
+    function showNotification(msg, isError = false) {
+        const n = document.getElementById('notification');
+        n.textContent = msg;
+        n.classList.add('show');
+        if (isError) n.classList.add('error');
+        else n.classList.remove('error');
+        setTimeout(() => n.classList.remove('show'), 3000);
+    }
 
-// CONTRASEÑA DEL PANEL
-const ADMIN_PASSWORD = 'Adriano2026';
+    async function checkSession() {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session) {
+            currentSession = session;
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            await loadData();
+        } else {
+            document.getElementById('loginPanel').style.display = 'flex';
+            document.getElementById('adminContent').style.display = 'none';
+        }
+    }
 
-let isLoggedIn = false;
+    async function login() {
+        const email = document.getElementById('adminEmail').value.trim();
+        const password = document.getElementById('adminPassword').value;
+        
+        if (!email || !password) {
+            showNotification('❌ Completa todos los campos', true);
+            return;
+        }
+        
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+        
+        if (error) {
+            document.getElementById('loginError').textContent = 'Email o contraseña incorrectos';
+            showNotification('❌ Error al iniciar sesión: ' + error.message, true);
+        } else {
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('adminPassword').value = '';
+            currentSession = data.session;
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            await loadData();
+            showNotification('✅ Sesión iniciada correctamente');
+        }
+    }
 
-function showNotification(msg, isError = false) {
-    const n = document.getElementById('notification');
-    n.textContent = msg;
-    n.classList.add('show');
-    if (isError) n.classList.add('error');
-    else n.classList.remove('error');
-    setTimeout(() => n.classList.remove('show'), 3000);
-}
-
-function checkLogin() {
-    const saved = localStorage.getItem('admin_logged_in');
-    if (saved === 'true') {
-        isLoggedIn = true;
-        document.getElementById('loginPanel').style.display = 'none';
-        document.getElementById('adminContent').style.display = 'block';
-        loadData();
-    } else {
+    async function logout() {
+        await _supabase.auth.signOut();
+        currentSession = null;
         document.getElementById('loginPanel').style.display = 'flex';
         document.getElementById('adminContent').style.display = 'none';
+        showNotification('👋 Sesión cerrada');
     }
-}
 
-async function loadData() {
-    await loadProducts();
-    await loadStats();
-    await loadCarts();
-}
-
-async function loadProducts() {
-    const { data, error } = await sbAdmin.from('products').select('*').order('id', { ascending: false });
-    if (error) {
-        showNotification('Error cargando productos: ' + error.message, true);
-        return;
+    async function loadData() {
+        await loadProducts();
+        await loadStats();
+        await loadCarts();
     }
-    
-    document.getElementById('totalProducts').textContent = data.length;
-    
-    const tbody = document.getElementById('productsList');
-    tbody.innerHTML = data.map(p => `
-        <tr>
-            <td><img src="${p.image_url}" class="product-image" onerror="this.src='https://placehold.co/50x60'"></td>
-            <td>${p.id}</td>
-            <td>${escapeHtml(p.name)}</td>
-            <td>€${p.price}</td>
-            <td>${p.category}</td>
-            <td>
-                <button class="btn-edit" onclick="editProduct(${p.id})">✏️</button>
-                <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
-            </td>
-        </tr>
-    `).join('');
-}
 
-async function loadStats() {
-    const { count: cartCount } = await sbAdmin.from('cart').select('*', { count: 'exact', head: true });
-    document.getElementById('totalCarts').textContent = cartCount || 0;
-    
-    const { count: userCount } = await sbAdmin.from('users').select('*', { count: 'exact', head: true });
-    document.getElementById('totalUsers').textContent = userCount || 0;
-}
-
-async function loadCarts() {
-    const { data, error } = await sbAdmin
-        .from('cart')
-        .select('id, user_id, products(name, price), created_at')
-        .order('created_at', { ascending: false })
-        .limit(20);
-    
-    if (error) {
-        console.error('Error cargando pedidos:', error);
-        return;
-    }
-    
-    const userIds = [...new Set(data.map(c => c.user_id))];
-    const { data: users } = await sbAdmin.from('users').select('id, name, phone').in('id', userIds);
-    const userMap = {};
-    users?.forEach(u => userMap[u.id] = u);
-    
-    const tbody = document.getElementById('cartsList');
-    if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay pedidos aún</td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = data.map(cart => {
-        const user = userMap[cart.user_id] || { name: 'Usuario', phone: '-' };
-        const products = cart.products ? [cart.products] : [];
-        const total = products.reduce((sum, p) => sum + (p?.price || 0), 0);
-        const productNames = products.map(p => p?.name).filter(Boolean).join(', ');
-        const date = cart.created_at ? new Date(cart.created_at).toLocaleDateString() : '-';
-        return `
+    async function loadProducts() {
+        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: false });
+        if (error) { showNotification('Error cargando productos: ' + error.message, true); return; }
+        
+        document.getElementById('totalProducts').textContent = data.length;
+        const tbody = document.getElementById('productsList');
+        tbody.innerHTML = data.map(p => `
             <tr>
-                <td>${escapeHtml(user.name || 'Usuario')}</td>
-                <td>${escapeHtml(user.phone || '-')}</td>
-                <td>${escapeHtml(productNames || '-')}</td>
-                <td>€${total}</td>
-                <td>${date}</td>
+                <td><img src="${p.image_url}" class="product-image" onerror="this.src='https://placehold.co/50x60'"></td>
+                <td>${p.id}</td>
+                <td>${escapeHtml(p.name)}</td>
+                <td>€${p.price}</td>
+                <td>${p.category}</td>
+                <td>
+                    <button class="btn-edit" onclick="editProduct(${p.id})">✏️</button>
+                    <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                </td>
             </tr>
-        `;
-    }).join('');
-}
-
-async function addProduct() {
-    const name = document.getElementById('prodName').value.trim();
-    const price = parseFloat(document.getElementById('prodPrice').value);
-    const category = document.getElementById('prodCategory').value;
-    const image_url = document.getElementById('prodImage').value.trim();
-    
-    if (!name) { showNotification('❌ El nombre es requerido', true); return; }
-    if (isNaN(price) || price <= 0) { showNotification('❌ Precio inválido', true); return; }
-    if (!image_url) { showNotification('❌ La URL de la imagen es requerida', true); return; }
-    
-    const { error } = await sbAdmin.from('products').insert({ name, price, category, image_url });
-    
-    if (error) {
-        showNotification('❌ Error al añadir: ' + error.message, true);
-    } else {
-        showNotification('✅ Producto añadido correctamente');
-        document.getElementById('prodName').value = '';
-        document.getElementById('prodPrice').value = '';
-        document.getElementById('prodImage').value = '';
-        await loadProducts();
-        await loadStats();
+        `).join('');
     }
-}
 
-window.editProduct = async function(id) {
-    const newName = prompt('Nuevo nombre del producto:');
-    if (!newName) return;
-    
-    const newPrice = parseFloat(prompt('Nuevo precio:'));
-    if (isNaN(newPrice)) return;
-    
-    const { error } = await sbAdmin.from('products').update({ name: newName, price: newPrice }).eq('id', id);
-    
-    if (error) {
-        showNotification('❌ Error al editar: ' + error.message, true);
-    } else {
-        showNotification('✅ Producto editado correctamente');
-        await loadProducts();
+    async function loadStats() {
+        const { count: cartCount } = await _supabase.from('cart').select('*', { count: 'exact', head: true });
+        document.getElementById('totalCarts').textContent = cartCount || 0;
+        const { count: userCount } = await _supabase.from('users').select('*', { count: 'exact', head: true });
+        document.getElementById('totalUsers').textContent = userCount || 0;
     }
-};
 
-window.deleteProduct = async function(id) {
-    if (!confirm('¿Estás seguro de eliminar este producto?')) return;
-    
-    const { error } = await sbAdmin.from('products').delete().eq('id', id);
-    
-    if (error) {
-        showNotification('❌ Error al eliminar: ' + error.message, true);
-    } else {
-        showNotification('✅ Producto eliminado');
-        await loadProducts();
-        await loadStats();
+    async function loadCarts() {
+        const { data, error } = await _supabase.from('cart').select('id, user_id, products(name, price), created_at').order('created_at', { ascending: false }).limit(20);
+        if (error) { console.error('Error cargando pedidos:', error); return; }
+        
+        const userIds = [...new Set(data.map(c => c.user_id))];
+        const { data: users } = await _supabase.from('users').select('id, name, phone').in('id', userIds);
+        const userMap = {};
+        users?.forEach(u => userMap[u.id] = u);
+        
+        const tbody = document.getElementById('cartsList');
+        if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay pedidos aún</td></tr>'; return; }
+        
+        tbody.innerHTML = data.map(cart => {
+            const user = userMap[cart.user_id] || { name: 'Usuario', phone: '-' };
+            const products = cart.products ? [cart.products] : [];
+            const total = products.reduce((sum, p) => sum + (p?.price || 0), 0);
+            const productNames = products.map(p => p?.name).filter(Boolean).join(', ');
+            const date = cart.created_at ? new Date(cart.created_at).toLocaleDateString() : '-';
+            return `<tr><td>${escapeHtml(user.name || 'Usuario')}</td><td>${escapeHtml(user.phone || '-')}</td><td>${escapeHtml(productNames || '-')}</td><td>€${total}</td><td>${date}</td></tr>`;
+        }).join('');
     }
-};
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+    async function addProduct() {
+        const name = document.getElementById('prodName').value.trim();
+        const price = parseFloat(document.getElementById('prodPrice').value);
+        const category = document.getElementById('prodCategory').value;
+        const image_url = document.getElementById('prodImage').value.trim();
+        
+        if (!name) { showNotification('❌ El nombre es requerido', true); return; }
+        if (isNaN(price) || price <= 0) { showNotification('❌ Precio inválido', true); return; }
+        if (!image_url) { showNotification('❌ La URL de la imagen es requerida', true); return; }
+        
+        const { error } = await _supabase.from('products').insert({ name, price, category, image_url });
+        if (error) { showNotification('❌ Error al añadir: ' + error.message, true); }
+        else {
+            showNotification('✅ Producto añadido correctamente');
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodImage').value = '';
+            await loadProducts();
+            await loadStats();
+        }
+    }
+
+    window.editProduct = async function(id) {
+        const newName = prompt('Nuevo nombre del producto:');
+        if (!newName) return;
+        const newPrice = parseFloat(prompt('Nuevo precio:'));
+        if (isNaN(newPrice)) return;
+        const { error } = await _supabase.from('products').update({ name: newName, price: newPrice }).eq('id', id);
+        if (error) { showNotification('❌ Error al editar: ' + error.message, true); }
+        else { showNotification('✅ Producto editado correctamente'); await loadProducts(); }
+    };
+
+    window.deleteProduct = async function(id) {
+        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+        const { error } = await _supabase.from('products').delete().eq('id', id);
+        if (error) { showNotification('❌ Error al eliminar: ' + error.message, true); }
+        else { showNotification('✅ Producto eliminado'); await loadProducts(); await loadStats(); }
+    };
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        checkSession();
+        document.getElementById('loginBtn').onclick = login;
+        document.getElementById('logoutBtn').onclick = logout;
+        document.getElementById('addProductBtn').onclick = addProduct;
+        document.getElementById('adminPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
     });
-}
-
-function login() {
-    const password = document.getElementById('adminPassword').value;
-    if (password === ADMIN_PASSWORD) {
-        localStorage.setItem('admin_logged_in', 'true');
-        isLoggedIn = true;
-        document.getElementById('loginPanel').style.display = 'none';
-        document.getElementById('adminContent').style.display = 'block';
-        document.getElementById('loginError').textContent = '';
-        document.getElementById('adminPassword').value = '';
-        loadData();
-    } else {
-        document.getElementById('loginError').textContent = 'Contraseña incorrecta';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('admin_logged_in');
-    isLoggedIn = false;
-    document.getElementById('loginPanel').style.display = 'flex';
-    document.getElementById('adminContent').style.display = 'none';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    checkLogin();
-    
-    document.getElementById('loginBtn').onclick = login;
-    document.getElementById('logoutBtn').onclick = logout;
-    document.getElementById('addProductBtn').onclick = addProduct;
-    
-    document.getElementById('adminPassword').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') login();
-    });
-});
 </script>
 
 </body>
