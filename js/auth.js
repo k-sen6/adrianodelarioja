@@ -1,5 +1,6 @@
 // js/auth.js
 import { supabase } from './supabase-client.js';
+import { escapeHtml } from './helpers.js';
 
 let currentUser = null;
 
@@ -16,6 +17,26 @@ function generateUUID() {
   });
 }
 
+
+
+// Verificar session_token contra Supabase
+async function verifySession(sessionToken) {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, name, phone')
+      .eq('session_token', sessionToken)
+      .single();
+    
+    if (error || !data) {
+      return null;
+    }
+    return data;
+  } catch (e) {
+    return null;
+  }
+}
+
 // Login con ID único
 export async function login(name, phone) {
   if (!name || !name.trim()) {
@@ -27,7 +48,7 @@ export async function login(name, phone) {
   }
   
   const cleanPhone = phone.trim().replace(/\s/g, '');
-  const cleanName = name.trim();
+  const cleanName = escapeHtml(name.trim());
   const userId = `${generateUUID()}_${Date.now()}`;
   const sessionToken = generateUUID();
   
@@ -54,15 +75,14 @@ export async function login(name, phone) {
       });
     
     if (error) {
-      console.error('Error guardando usuario:', error);
+      console.error('[auth] Error guardando usuario:', error);
     }
     
     currentUser = user;
-    console.log('✅ Login exitoso:', cleanName);
     return user;
     
   } catch (error) {
-    console.error('Error en login:', error);
+    console.error('[auth] Error en login:', error);
     throw new Error('Error al iniciar sesión');
   }
 }
@@ -71,20 +91,35 @@ export async function login(name, phone) {
 export function logout() {
   currentUser = null;
   localStorage.removeItem('adriano_user');
-  console.log('👋 Sesión cerrada');
 }
 
-// Cargar sesión guardada
-export function loadSession() {
+// Cargar sesión guardada con verificación server-side
+export async function loadSession() {
   try {
     const saved = localStorage.getItem('adriano_user');
     if (saved) {
-      currentUser = JSON.parse(saved);
-      console.log('🔄 Sesión cargada:', currentUser.name);
-      return currentUser;
+      const parsed = JSON.parse(saved);
+      
+      // Verificar session_token contra Supabase
+      if (parsed.session_token) {
+        const verified = await verifySession(parsed.session_token);
+        if (verified) {
+          currentUser = {
+            ...parsed,
+            name: verified.name,
+            phone: verified.phone
+          };
+          return currentUser;
+        }
+      }
+      
+      // Si la verificación falla, limpiar sesión
+      localStorage.removeItem('adriano_user');
+      currentUser = null;
+      return null;
     }
   } catch (error) {
-    console.error('Error cargando sesión:', error);
+    console.error('[auth] Error cargando sesión:', error);
     localStorage.removeItem('adriano_user');
   }
   return null;

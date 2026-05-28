@@ -1,4 +1,4 @@
-name: Inject Config
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -6,36 +6,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  inject:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
       - uses: actions/checkout@v4
       
-      - name: Force remove config.js from tracking (ignored by .gitignore)
-        run: |
-          git rm --cached config.js 2>/dev/null || true
-          rm -f config.js
-      
-      - name: Create config file
+      - name: Inject config.js
         run: |
           cat > config.js << 'EOF'
           window.__APP_CONFIG__ = {
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
             supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
+            whatsappNumber: '${{ secrets.WHATSAPP_NUMBER }}',
             buildRun: '${{ github.run_id }}',
             buildDate: '${{ github.event.repository.updated_at }}'
           };
-          console.log('✅ Configuración cargada desde build time');
           EOF
           
-          echo "✅ config.js creado"
+          echo "✅ config.js creado con secrets"
       
-      - name: Commit and push config file
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f config.js
-          git diff --staged --quiet || git commit -m "chore: update config.js [skip ci]"
-          git push
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

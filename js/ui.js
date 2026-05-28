@@ -1,6 +1,9 @@
 // js/ui.js
 let notificationTimeout = null;
 
+// Sanitizar texto para prevenir XSS (textContent hace esto automáticamente)
+// pero aseguramos que solo se usen textContent en lugar de innerHTML para datos dinámicos
+
 // Crear elemento de notificación
 function ensureNotificationElement() {
   let notif = document.getElementById('notificationAdvanced');
@@ -111,6 +114,7 @@ function ensureNotificationElement() {
 }
 
 // Mostrar notificación
+// NOTA: Usamos textContent (no innerHTML) para toda data dinámica, previniendo XSS
 export function showNotification(product, action, onUndo = null) {
   const notif = ensureNotificationElement();
   const img = document.getElementById('notifImg');
@@ -135,6 +139,7 @@ export function showNotification(product, action, onUndo = null) {
       img.src = product.image_url || 'https://i.postimg.cc/6QSkBPyF/Hero.webp';
       img.style.display = 'block';
     }
+    // textContent sanitiza automáticamente - previene XSS
     title.textContent = product.name;
     message.textContent = messages[action] || 'actualizado';
   }

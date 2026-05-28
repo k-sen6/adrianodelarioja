@@ -3,26 +3,22 @@ import { supabase, checkConnection } from './supabase-client.js';
 import { login, logout, loadSession, getCurrentUser } from './auth.js';
 import { loadCart, addToCart, removeFromCart, getCart } from './cart.js';
 import { showSimpleNotification } from './ui.js';
+import { CONFIG } from './config.js';
 
 // Exponer funciones globalmente
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
 
-const WHATSAPP_NUMBER = '5350979465';
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 Iniciando aplicación...');
-  
   // Verificar conexión
   const isConnected = await checkConnection();
   if (!isConnected) {
-    console.warn('⚠️ Problemas de conexión');
     showSimpleNotification('⚠️ Problemas de conexión', 'error');
   }
   
   // Cargar sesión guardada
-  const savedUser = loadSession();
+  const savedUser = await loadSession();
   if (savedUser) {
     const userNameSpan = document.getElementById('userNameDisplay');
     const loginBtn = document.getElementById('loginBtn');
@@ -41,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof loadProducts === 'function') {
     await loadProducts();
   } else {
-    console.warn('⚠️ loadProducts no está definida');
+    console.warn('[main] loadProducts no está definida');
   }
   
   // Hero image
@@ -63,8 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => loader.style.display = 'none', 500);
     }
   }, 800);
-  
-  console.log('✅ Aplicación inicializada');
 });
 
 function setupEventListeners() {
@@ -109,7 +103,7 @@ function setupEventListeners() {
           if (loginBtnElem) loginBtnElem.style.display = 'none';
           if (logoutBtnElem) logoutBtnElem.style.display = 'flex';
           await loadCart();
-          showSimpleNotification(`✨ Bienvenido, ${name} ✨`, 'success');
+          showSimpleNotification(`✨ Bienvenido`, 'success');
         }
       } catch (error) {
         showSimpleNotification(error.message, 'error');
@@ -152,7 +146,7 @@ function setupEventListeners() {
       
       const message = `✨ *PEDIDO - ADRIANO DE LA RIOJA* ✨%0A%0A👤 *Cliente:* ${userName}%0A📱 *WhatsApp:* ${userPhone}%0A%0A📦 *PRODUCTOS:*%0A${items}%0A%0A💰 *TOTAL:* €${total}%0A%0A📍 *Retiro:* Obispo #508, La Habana Vieja`;
       
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+      window.open(`https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${message}`, '_blank');
     };
   }
   

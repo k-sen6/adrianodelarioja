@@ -9,6 +9,7 @@
 window.__APP_CONFIG__ = {
   supabaseUrl: 'https://TU_PROYECTO.supabase.co',
   supabaseKey: 'tu-anon-key-aqui',
+  whatsappNumber: '__WHATSAPP_NUMBER__',
   buildRun: 'local',
   buildDate: new Date().toISOString()
 };

@@ -1,1 +1,22 @@
-Este proyecto posee vulnerabilidades aún, como las api keys mostradas en el codigo, no usar para fines comerciales 
+Notas del Proyecto - Seguridad
+==============================
+
+Las siguientes vulnerabilidades han sido corregidas:
+
+✅ API keys de Supabase reemplazadas por placeholders (inyectadas via GitHub Actions Secrets)
+✅ Sistema de autenticación mejorado con verificación server-side de session_token
+✅ Email de admin removido del HTML (usa variables de entorno)
+✅ Rate limiting agregado al panel de administración
+✅ XSS corregido en escapeHtml (escapa comillas también)
+✅ Notificaciones sanitizadas (textContent en lugar de innerHTML)
+✅ Número de WhatsApp movido a variable de entorno
+✅ SRI integrity hashes agregados a scripts CDN
+✅ Content Security Policy (CSP) implementada
+✅ console.log con datos sensibles removidos
+✅ Número de teléfono en config.example.js reemplazado por placeholder
+
+Para producción:
+- Configurar SUPABASE_URL, SUPABASE_ANON_KEY y WHATSAPP_NUMBER como
+  GitHub Secrets en el repositorio
+- Rotar las keys de Supabase (las anteriores están comprometidas)
+- Considerar limpiar el historial de git con bfg-repo-cleaner

@@ -2,8 +2,11 @@
 import { supabase } from './supabase-client.js';
 import { getCurrentUser } from './auth.js';
 import { showNotification } from './ui.js';
+import { escapeHtml } from './helpers.js';
 
 let cart = [];
+
+
 
 // Cargar carrito
 export async function loadCart() {
@@ -28,7 +31,7 @@ export async function loadCart() {
     return cart;
     
   } catch (error) {
-    console.error('Error loading cart:', error);
+    console.error('[cart] Error loading cart:', error);
     cart = [];
     updateCartUI();
     return cart;
@@ -67,7 +70,7 @@ export async function addToCart(productId, productName, productPrice, productIma
     return true;
     
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    console.error('[cart] Error adding to cart:', error);
     showNotification({ name: productName }, 'error');
     return false;
   }
@@ -82,7 +85,7 @@ async function removeFromCartDirect(productId, productName) {
     await supabase.from('cart').delete().eq('id', item.id);
     await loadCart();
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[cart] Error:', error);
   }
 }
 
@@ -98,7 +101,7 @@ export async function removeFromCart(cartId, productName, productImage, productI
       () => addToCart(productId, productName, productPrice, productImage)
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[cart] Error:', error);
     showNotification({ name: productName }, 'error');
   }
 }
@@ -120,16 +123,18 @@ function updateCartUI() {
   container.innerHTML = cart.map(item => {
     const price = item.products?.price || 0;
     total += price;
+    const safeName = escapeHtml(item.products?.name || 'Producto');
+    const safeImage = escapeHtml(item.products?.image_url || 'https://i.postimg.cc/6QSkBPyF/Hero.webp');
     return `
       <div class="cart-item">
-        <img class="cart-item-image" src="${item.products?.image_url || 'https://i.postimg.cc/6QSkBPyF/Hero.webp'}" 
+        <img class="cart-item-image" src="${safeImage}" 
              onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
         <div class="cart-item-details">
-          <div class="cart-item-name">${item.products?.name || 'Producto'}</div>
+          <div class="cart-item-name">${safeName}</div>
           <div class="cart-item-price">€${price}</div>
         </div>
         <button class="cart-item-remove" 
-                onclick="window.removeFromCart(${item.id}, '${item.products?.name || ''}', '${item.products?.image_url || ''}', ${item.product_id}, ${price})">
+                onclick="window.removeFromCart(${item.id}, '${safeName.replace(/'/g, "\\'")}', '${safeImage.replace(/'/g, "\\'")}', ${item.product_id}, ${price})">
           🗑️
         </button>
       </div>

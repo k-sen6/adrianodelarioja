@@ -1,11 +1,14 @@
 // js/products.js
 import { supabase } from './supabase-client.js';
+import { escapeHtml } from './helpers.js';
 
 let allProducts = [];
 let currentFilter = 'all';
 let currentSearch = '';
 const ITEMS_PER_PAGE = 6;
 let currentPage = 1;
+
+
 
 export async function loadProducts() {
   const container = document.getElementById('productGrid');
@@ -16,9 +19,9 @@ export async function loadProducts() {
   const { data, error } = await supabase.from('products').select('*');
 
   if (error) {
-    console.error('Error loading products:', error);
+    console.error('[products] Error loading products:', error);
     if (container) {
-      container.innerHTML = `<div class="loading">Error: ${error.message}</div>`;
+      container.innerHTML = '<div class="loading">Error al cargar productos</div>';
     }
     return;
   }
@@ -65,14 +68,19 @@ export function renderProducts() {
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
   const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
 
-  container.innerHTML = pageItems.map(p => `
+  container.innerHTML = pageItems.map(p => {
+    const safeName = escapeHtml(p.name);
+    const safeImage = escapeHtml(p.image_url);
+    const safeNameForAttr = safeName.replace(/'/g, "\\'");
+    const safeImageForAttr = safeImage.replace(/'/g, "\\'");
+    return `
     <div class="product-card">
-      <img src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
+      <img src="${safeImage}" alt="${safeName}" loading="lazy" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
       <div class="product-info">
-        <div class="product-name">${p.name}</div>
+        <div class="product-name">${safeName}</div>
         <div class="product-price">€${p.price}</div>
         <div class="product-actions">
-          <button class="product-btn" onclick="window.addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image_url}')">
+          <button class="product-btn" onclick="window.addToCart(${p.id}, '${safeNameForAttr}', ${p.price}, '${safeImageForAttr}')">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
               <circle cx="9" cy="21" r="1"/>
               <circle cx="20" cy="21" r="1"/>
@@ -82,7 +90,7 @@ export function renderProducts() {
         </div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 
   renderPagination(totalPages);
 }
