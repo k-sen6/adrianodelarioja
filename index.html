@@ -1173,6 +1173,70 @@
             color: var(--gold);
         }
         
+        /* ========== SEARCH ========== */
+        .search-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.7rem 1.2rem;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+        }
+        
+        /* ========== PAGINATION ========== */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 3rem;
+        }
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .page-btn {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--gold);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .page-btn:hover:not(:disabled) {
+            background: var(--gold);
+            color: #050505;
+            border-color: var(--gold);
+        }
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .page-info {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .stats-container { gap: 2rem; flex-direction: column; align-items: center; }
@@ -1325,7 +1389,7 @@
             Cada prenda y calzado nace del gesto preciso del artesano, pensado para el ritmo de la ciudad contemporánea.
         </p>
 
-        <!-- FILTROS -->
+        <!-- FILTROS + BÚSQUEDA -->
         <div class="filters-bar reveal">
             <button class="filter-btn active" data-filter="all">Todos</button>
             <button class="filter-btn" data-filter="vestidos">
@@ -1353,12 +1417,16 @@
                 </svg>
                 Calzado
             </button>
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos..." aria-label="Buscar productos">
+            </div>
         </div>
 
         <!-- PRODUCT GRID -->
         <div id="productGrid" class="product-grid">
             <div class="loading">Cargando productos...</div>
         </div>
+        <div id="paginationControls" class="pagination-container"></div>
 
         <div class="story-about" id="historia">
             <div class="story-card reveal">
@@ -1483,27 +1551,21 @@
 
 <script>
 // ============================================
-// SUPABASE CONFIG - Usando variables seguras
+// SUPABASE CONFIG - Claves inyectadas por GitHub Actions via config.js
 // ============================================
 
-// Intentar cargar desde window.__APP_CONFIG__ (inyectado por GitHub Actions)
-// Si no existe, usar valores por defecto (para desarrollo local)
-const SUPABASE_URL = (typeof window.__APP_CONFIG__ !== 'undefined' && window.__APP_CONFIG__.supabaseUrl) 
-    ? window.__APP_CONFIG__.supabaseUrl 
-    : '__SUPABASE_URL__';
+const SUPABASE_URL = window.__APP_CONFIG__?.supabaseUrl || '__SUPABASE_URL__';
+const SUPABASE_KEY = window.__APP_CONFIG__?.supabaseKey || '__SUPABASE_ANON_KEY__';
 
-const SUPABASE_KEY = (typeof window.__APP_CONFIG__ !== 'undefined' && window.__APP_CONFIG__.supabaseKey)
-    ? window.__APP_CONFIG__.supabaseKey
-    : '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
+if (!SUPABASE_URL || SUPABASE_URL.startsWith('__')) {
+    console.error('❌ SUPABASE_URL no configurada — esperando inyección de GitHub Actions');
+}
+if (!SUPABASE_KEY || SUPABASE_KEY.startsWith('__')) {
+    console.error('❌ SUPABASE_ANON_KEY no configurada — esperando inyección de GitHub Actions');
+}
 
 const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Mostrar en consola si se usó la configuración segura o fallback
-if (typeof window.__APP_CONFIG__ !== 'undefined') {
-    console.log('🔒 Usando configuración segura (build:', window.__APP_CONFIG__.buildRun, ')');
-} else {
-    console.warn('⚠️ Usando configuración de respaldo - Las claves están visibles');
-}
+console.log('🔒 Usando configuración inyectada (build:', window.__APP_CONFIG__?.buildRun || 'N/A', ')');
 
 // ============================================
 // ESTADO GLOBAL
@@ -1513,6 +1575,9 @@ let allProducts = [];
 let cart = [];
 let wishlist = [];
 let currentFilter = 'all';
+let currentSearch = '';
+let currentPage = 1;
+const ITEMS_PER_PAGE = 6;
 
 try {
     const savedUser = localStorage.getItem('adriano_user');
@@ -1610,18 +1675,39 @@ async function loadProducts() {
     if (error) { container.innerHTML = `<div class="loading">Error: ${error.message}</div>`; return; }
     if (!data || data.length === 0) { container.innerHTML = '<div class="loading">No hay productos.</div>'; return; }
     allProducts = data;
+    currentPage = 1;
     renderProducts();
 }
 
-function renderProducts() {
+function getFiltered() {
     let filtered = currentFilter === 'all' ? allProducts : allProducts.filter(p => p.category === currentFilter);
+    if (currentSearch.trim()) {
+        const q = currentSearch.trim().toLowerCase();
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+    }
+    return filtered;
+}
+
+function renderProducts() {
+    const filtered = getFiltered();
     const container = document.getElementById('productGrid');
-    if (!filtered.length) { container.innerHTML = '<div class="loading">✨ No hay productos en esta categoría ✨</div>'; return; }
-    container.innerHTML = filtered.map(p => `
+    if (!filtered.length) {
+        container.innerHTML = '<div class="loading">✨ No hay productos en esta categoría ✨</div>';
+        renderPagination(0);
+        return;
+    }
+
+    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    container.innerHTML = pageItems.map(p => `
         <div class="product-card">
-            <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
+            <img src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
             <div class="product-info">
-                <div class="product-name">${p.name}</div>
+                <div class="product-name">${escapeHtml(p.name)}</div>
                 <div class="product-price">€${p.price}</div>
                 <div class="product-actions">
                     <button class="product-btn ${wishlist.includes(p.id) ? 'wishlist-active' : ''}" onclick="toggleWishlist(${p.id})">
@@ -1629,7 +1715,7 @@ function renderProducts() {
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                         </svg>
                     </button>
-                    <button class="product-btn" onclick="addToCart(${p.id}, '${p.name}', ${p.price})">
+                    <button class="product-btn" onclick="addToCart(${p.id}, '${escapeHtml(p.name)}', ${p.price})">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                             <circle cx="9" cy="21" r="1"/>
                             <circle cx="20" cy="21" r="1"/>
@@ -1640,7 +1726,7 @@ function renderProducts() {
             </div>
         </div>
     `).join('');
-    
+
     document.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
@@ -1648,6 +1734,34 @@ function renderProducts() {
             card.style.setProperty('--y', ((e.clientY - rect.top) / rect.height) * 100 + '%');
         });
     });
+
+    renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+    const container = document.getElementById('paginationControls');
+    if (!container) return;
+    if (totalPages <= 1) { container.innerHTML = ''; return; }
+    container.innerHTML = `
+        <div class="pagination">
+            <button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>‹ Anterior</button>
+            <span class="page-info">Página ${currentPage} de ${totalPages}</span>
+            <button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Siguiente ›</button>
+        </div>
+    `;
+}
+
+function goToPage(page) {
+    const totalPages = Math.ceil(getFiltered().length / ITEMS_PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderProducts();
+    document.getElementById('productGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
 }
 
 // ============================================
@@ -1716,9 +1830,23 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentFilter = btn.dataset.filter;
+            currentPage = 1;
             renderProducts();
         };
     });
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let searchTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentSearch = searchInput.value;
+                currentPage = 1;
+                renderProducts();
+            }, 300);
+        });
+    }
     
     document.getElementById('menuIcon').onclick = () => document.getElementById('navLinks').classList.toggle('active');
     

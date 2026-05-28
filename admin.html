@@ -6,6 +6,7 @@
     <title>Panel Admin · Adriano de la Rioja</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -241,13 +242,42 @@
 
 <div id="notification" class="notification"></div>
 
+<!-- Modal Editar Producto -->
+<div id="editModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:#1A1A1A;padding:2rem;border-radius:16px;border:1px solid #D4AF37;max-width:400px;width:90%;">
+        <h3 style="color:#D4AF37;margin-bottom:1.5rem;text-align:center;">✏️ Editar Producto</h3>
+        <div class="form-group"><label>Nombre</label><input type="text" id="editName"></div>
+        <div class="form-group"><label>Precio (€)</label><input type="number" id="editPrice"></div>
+        <div style="display:flex;gap:1rem;margin-top:1rem;">
+            <button class="btn-primary" onclick="saveEdit()" style="flex:1;">💾 Guardar</button>
+            <button onclick="closeEditModal()" style="flex:1;background:#444;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Producto -->
+<div id="deleteModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:#1A1A1A;padding:2rem;border-radius:16px;border:1px solid #dc2626;max-width:400px;width:90%;text-align:center;">
+        <h3 style="color:#dc2626;margin-bottom:1rem;">🗑️ ¿Eliminar producto?</h3>
+        <p style="color:#AAA;margin-bottom:1.5rem;">Esta acción no se puede deshacer.</p>
+        <div style="display:flex;gap:1rem;">
+            <button onclick="confirmDelete()" style="flex:1;background:#dc2626;color:white;border:none;padding:0.8rem;border-radius:8px;cursor:pointer;font-weight:600;">Sí, eliminar</button>
+            <button onclick="closeDeleteModal()" style="flex:1;background:#444;color:white;border:none;padding:0.8rem;border-radius:8px;cursor:pointer;font-weight:600;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ============================================
-    // CONFIGURACIÓN SUPABASE
+    // CONFIGURACIÓN SUPABASE (inyectada por GitHub Actions)
     // ============================================
-    const SUPABASE_URL = '__SUPABASE_URL__';
-    const SUPABASE_KEY = '__SUPABASE_ANON_KEY__.VYNLGCZSbPFgC7ED28w_ppNKNYcEaYVLy9GSMB1KMvs';
-    
+    const SUPABASE_URL = window.__APP_CONFIG__?.supabaseUrl || '__SUPABASE_URL__';
+    const SUPABASE_KEY = window.__APP_CONFIG__?.supabaseKey || '__SUPABASE_ANON_KEY__';
+
+    if (!SUPABASE_URL || SUPABASE_URL.startsWith('__')) {
+      document.getElementById('loginError').textContent = '❌ Configuración de Supabase no inyectada';
+    }
+
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentSession = null;
 
@@ -329,8 +359,8 @@
                 <td>€${p.price}</td>
                 <td>${p.category}</td>
                 <td>
-                    <button class="btn-edit" onclick="editProduct(${p.id})">✏️</button>
-                    <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>
+                    <button class="btn-edit" onclick="openEditModal(${p.id})">✏️</button>
+                    <button class="btn-danger" onclick="openDeleteModal(${p.id})">🗑️</button>
                 </td>
             </tr>
         `).join('');
@@ -387,21 +417,51 @@
         }
     }
 
-    window.editProduct = async function(id) {
-        const newName = prompt('Nuevo nombre del producto:');
-        if (!newName) return;
-        const newPrice = parseFloat(prompt('Nuevo precio:'));
-        if (isNaN(newPrice)) return;
-        const { error } = await _supabase.from('products').update({ name: newName, price: newPrice }).eq('id', id);
-        if (error) { showNotification('❌ Error al editar: ' + error.message, true); }
-        else { showNotification('✅ Producto editado correctamente'); await loadProducts(); }
+    let editingProductId = null;
+    let deletingProductId = null;
+
+    window.openEditModal = async function(id) {
+      const { data, error } = await _supabase.from('products').select('name, price').eq('id', id).single();
+      if (error) { showNotification('❌ Error al cargar producto', true); return; }
+      editingProductId = id;
+      document.getElementById('editName').value = data.name || '';
+      document.getElementById('editPrice').value = data.price || '';
+      document.getElementById('editModal').style.display = 'flex';
     };
 
-    window.deleteProduct = async function(id) {
-        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
-        const { error } = await _supabase.from('products').delete().eq('id', id);
-        if (error) { showNotification('❌ Error al eliminar: ' + error.message, true); }
-        else { showNotification('✅ Producto eliminado'); await loadProducts(); await loadStats(); }
+    window.closeEditModal = function() {
+      editingProductId = null;
+      document.getElementById('editModal').style.display = 'none';
+    };
+
+    window.saveEdit = async function() {
+      if (!editingProductId) return;
+      const name = document.getElementById('editName').value.trim();
+      const price = parseFloat(document.getElementById('editPrice').value);
+      if (!name) { showNotification('❌ El nombre es requerido', true); return; }
+      if (isNaN(price) || price <= 0) { showNotification('❌ Precio inválido', true); return; }
+      const { error } = await _supabase.from('products').update({ name, price }).eq('id', editingProductId);
+      if (error) { showNotification('❌ Error al editar: ' + error.message, true); }
+      else { showNotification('✅ Producto editado correctamente'); await loadProducts(); }
+      closeEditModal();
+    };
+
+    window.openDeleteModal = function(id) {
+      deletingProductId = id;
+      document.getElementById('deleteModal').style.display = 'flex';
+    };
+
+    window.closeDeleteModal = function() {
+      deletingProductId = null;
+      document.getElementById('deleteModal').style.display = 'none';
+    };
+
+    window.confirmDelete = async function() {
+      if (!deletingProductId) return;
+      const { error } = await _supabase.from('products').delete().eq('id', deletingProductId);
+      if (error) { showNotification('❌ Error al eliminar: ' + error.message, true); }
+      else { showNotification('✅ Producto eliminado'); await loadProducts(); await loadStats(); }
+      closeDeleteModal();
     };
 
     function escapeHtml(str) {

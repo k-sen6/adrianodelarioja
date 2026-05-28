@@ -1,13 +1,11 @@
 // js/config.js
-// ATENCIÓN: Este archivo será sobrescrito por GitHub Actions
-// No pongas credenciales reales aquí
+// Las credenciales se cargan desde window.__APP_CONFIG__
+// que es inyectado por GitHub Actions en config.js (raíz)
+// En desarrollo local, copia config.example.js como config.js
 
 export const CONFIG = {
-  // Estas variables serán reemplazadas en el build
-  SUPABASE_URL: '__SUPABASE_URL__',
-  SUPABASE_ANON_KEY: '__SUPABASE_ANON_KEY__',
-  
-  // Variables públicas
+  SUPABASE_URL: window.__APP_CONFIG__?.supabaseUrl || '__SUPABASE_URL__',
+  SUPABASE_ANON_KEY: window.__APP_CONFIG__?.supabaseKey || '__SUPABASE_ANON_KEY__',
   WHATSAPP_NUMBER: '5350979465',
   STORE_ADDRESS: 'Obispo #508, La Habana Vieja',
   STORE_HOURS: '9:00 AM — 6:00 PM',
