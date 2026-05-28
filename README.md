@@ -6,7 +6,7 @@ Sitio web del atelier de moda **Adriano de la Rioja**, ubicado en La Habana Viej
 
 - **Frontend:** HTML + CSS (vanilla) con diseño oscuro/lujo
 - **Backend:** Supabase (base de datos, autenticación)
-- **CI/CD:** GitHub Actions (inyección segura de claves)
+- **CI/CD:** GitHub Actions (inyección segura de claves via Secrets)
 - **Despliegue:** GitHub Pages
 
 ## Estructura
@@ -16,14 +16,15 @@ Sitio web del atelier de moda **Adriano de la Rioja**, ubicado en La Habana Viej
 ├── admin.html          # Panel de administración
 ├── config.example.js   # Plantilla de configuración local
 ├── js/
-│   ├── supabase-client.js  # Cliente Supabase (usa config.js)
+│   ├── supabase-client.js  # Cliente Supabase
 │   ├── products.js         # Productos + paginación + búsqueda
 │   ├── cart.js             # Carrito de compras
 │   ├── auth.js             # Autenticación de usuarios
-│   ├── ui.js               # Notificaciones
+│   ├── ui.js               # Notificaciones con textContent (XSS-safe)
 │   ├── main.js             # Orquestador principal
+│   ├── helpers.js          # Utilidades compartidas (escapeHtml)
 │   └── config.js           # Constantes públicas
-├── css/                # (para futuros estilos externos)
+├── Note                # Historial de correcciones de seguridad
 └── .github/workflows/
     └── deploy.yml      # Inyecta secrets via GitHub Actions
 ```
@@ -43,11 +44,28 @@ python3 -m http.server 8000
 
 ## Seguridad
 
-Las claves de Supabase se inyectan mediante **GitHub Actions Secrets** en cada `push` a `main`. El archivo `config.js` está en `.gitignore` y nunca se sube al repositorio.
+### Credenciales
 
-Para configurar los secrets:
-1. Ve a Settings → Secrets and variables → Actions
-2. Agrega `SUPABASE_URL` y `SUPABASE_ANON_KEY`
+Las claves de Supabase y el número de WhatsApp se inyectan mediante **GitHub Actions Secrets** en cada `push` a `main`. El archivo `config.js` está en `.gitignore` y nunca se sube al repositorio.
+
+Para configurar los secrets en tu repositorio:
+1. Ve a **Settings → Secrets and variables → Actions**
+2. Agrega los siguientes secrets:
+   - `SUPABASE_URL` — URL de tu proyecto Supabase
+   - `SUPABASE_ANON_KEY` — Anon key de Supabase
+   - `WHATSAPP_NUMBER` — Número de WhatsApp (opcional)
+
+### Medidas implementadas
+
+| Medida | Descripción |
+|---|---|
+| **CSP** | Content Security Policy en index.html y admin.html |
+| **SRI** | Integrity hashes en scripts CDN de Supabase |
+| **XSS** | escapeHtml() compartido en helpers.js; textContent en lugar de innerHTML |
+| **Auth** | Verificación server-side de session_token contra Supabase |
+| **Rate limiting** | Control de intentos de login en admin.html |
+| **Secrets** | API keys y WhatsApp number inyectados via GitHub Actions Secrets |
+| **Git history** | Historial limpiado con git filter-branch (eliminadas keys de commits antiguos) |
 
 ## Panel Admin
 
