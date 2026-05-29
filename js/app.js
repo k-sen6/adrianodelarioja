@@ -40,6 +40,23 @@ function showNotification(msg) {
     n.textContent = msg;
     n.classList.add('show');
     setTimeout(() => n.classList.remove('show'), 2500);
+}// ============================================
+// CARGAR DATOS
+// ============================================
+async function loadCart() {
+    if (!currentUser) { cart = []; updateCartUI(); document.getElementById('cartCount').textContent = '0'; return; }
+    const { data } = await sbClient.from('cart').select('id,product_id,products(id,name,price,image_url,category)').eq('user_id', currentUser.id);
+    cart = data || [];
+    updateCartUI();
+    document.getElementById('cartCount').textContent = cart.length;
+}
+
+async function loadWishlist() {
+    if (!currentUser) { wishlist = []; document.getElementById('wishlistCount').textContent = '0'; renderProducts(); return; }
+    const { data } = await sbClient.from('wishlist').select('product_id').eq('user_id', currentUser.id);
+    wishlist = data?.map(w => w.product_id) || [];
+    document.getElementById('wishlistCount').textContent = wishlist.length;
+    renderProducts();
 }
 
 window.addToCart = async function(productId, productName, productPrice) {
@@ -81,25 +98,6 @@ window.toggleWishlist = async function(productId) {
     renderProducts();
 };
 
-// ============================================
-// CARGAR DATOS
-// ============================================
-async function loadCart() {
-    if (!currentUser) { cart = []; updateCartUI(); document.getElementById('cartCount').textContent = '0'; return; }
-    const { data } = await sbClient.from('cart').select('id,product_id,products(id,name,price,image_url,category)').eq('user_id', currentUser.id);
-    cart = data || [];
-    updateCartUI();
-    document.getElementById('cartCount').textContent = cart.length;
-}
-
-async function loadWishlist() {
-    if (!currentUser) { wishlist = []; document.getElementById('wishlistCount').textContent = '0'; renderProducts(); return; }
-    const { data } = await sbClient.from('wishlist').select('product_id').eq('user_id', currentUser.id);
-    wishlist = data?.map(w => w.product_id) || [];
-    document.getElementById('wishlistCount').textContent = wishlist.length;
-    renderProducts();
-}
-
 function updateCartUI() {
     const container = document.getElementById('cartItems');
     const totalSpan = document.getElementById('cartTotal');
@@ -109,6 +107,54 @@ function updateCartUI() {
         total += item.products.price;
         const safeName = escapeHtml(item.products.name);
         const safeImage = escapeHtml(item.products.image_url);
+        const safeNameAttr = safeName.replace(/'/g, "\\'");
+        return `<div class="cart-item">
+            <img class="cart-item-image" src="${safeImage}" onerror="this.src='https://i.postimg.cc/6QSkBPyF/Hero.webp'">
+            <div class="cart-item-details"><div class="cart-item-name">${safeName}</div><div class="cart-item-price">€${item.products.price}</div></div>
+            <button class="cart-item-remove" onclick="removeFromCart(${item.id}, '${safeNameAttr}')">🗑️</button>
+        </div>`;
+    }).join('');
+    totalSpan.textContent = `€${total}`;
+}
+
+async function loadProducts() {
+    const container = document.getElementById('productGrid');
+    container.innerHTML = '<div class="loading">Cargando productos...</div>';
+    const { data, error } = await sbClient.from('products').select('*');
+    if (error) { container.innerHTML = `<div class="loading">Error: ${error.message}</div>`; return; }
+    if (!data || data.length === 0) { container.innerHTML = '<div class="loading">No hay productos.</div>'; return; }
+    allProducts = data;
+    currentPage = 1;
+    renderProducts();
+}
+
+function getFiltered() {
+    let filtered = currentFilter === 'all' ? allProducts : allProducts.filter(p => p.category === currentFilter);
+    if (currentSearch.trim()) {
+        const q = currentSearch.trim().toLowerCase();
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+    }
+    return filtered;
+}
+
+function renderProducts() {
+    const filtered = getFiltered();
+    const container = document.getElementById('productGrid');
+    if (!filtered.length) {
+        container.innerHTML = '<div class="loading">✨ No hay productos en esta categoría ✨</div>';
+        renderPagination(0);
+        return;
+    }
+
+    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    container.innerHTML = pageItems.map(p => {
+        const safeName = escapeHtml(p.name);
+        const safeImage = escapeHtml(p.image_url);
         const safeNameAttr = safeName.replace(/'/g, "\\'");
         return `
         <div class="product-card">
