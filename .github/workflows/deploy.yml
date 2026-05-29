@@ -33,9 +33,7 @@ jobs:
           console.log('✅ Configuración de Supabase cargada desde config.js');
           EOF
           
-          # Verificar que el archivo se creó
-          ls -la config.js
-          cat config.js
+          echo "✅ config.js generado correctamente (build: ${{ github.run_id }})"
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
