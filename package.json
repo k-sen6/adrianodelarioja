@@ -1,0 +1,9 @@
+{
+  "name": "adrianodelarioja",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/escapeHtml.test.js && node tests/csp.test.js",
+    "test:rls": "node tests/rls.test.js"
+  }
+}
