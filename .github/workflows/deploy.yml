@@ -29,9 +29,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build
+        run: npm run build
+
       - name: Inject runtime config
         run: |
-          cat > public/config.js << 'EOF'
+          cat > dist/config.js << 'EOF'
           window.__APP_CONFIG__ = {
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
             supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
@@ -40,9 +43,6 @@ jobs:
             buildDate: '${{ github.event.repository.updated_at }}'
           };
           EOF
-
-      - name: Build
-        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
