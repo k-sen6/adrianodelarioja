@@ -1281,13 +1281,14 @@
 </div>
 
 <!-- Modal Login -->
-<div id="loginModal" class="modal">
+<div id="login-modal" class="modal">
     <div class="modal-content">
         <h3>✦ Identifícate ✦</h3>
         <p>Tu nombre y teléfono para guardar tu selección</p>
-        <input type="text" id="loginName" placeholder="Tu nombre">
-        <input type="tel" id="loginPhone" placeholder="Tu número de WhatsApp (ej: 5350979465)">
-        <button id="submitLoginBtn">Continuar →</button>
+        <input type="text" id="login-name" placeholder="Tu nombre">
+        <input type="tel" id="login-phone" placeholder="Tu número de WhatsApp (ej: 5350979465)">
+        <button id="submit-login-btn">Continuar →</button>
+        <div id="login-error" class="modal-error"></div>
         <small>Sin contraseñas. Solo necesitamos tus datos para contactarte.</small>
     </div>
 </div>
@@ -1296,15 +1297,15 @@
 <div id="notification" class="notification">✨ Producto añadido</div>
 
 <!-- Carrito Sidebar -->
-<div id="cartSidebar" class="cart-sidebar">
+<div id="cart-sidebar" class="cart-sidebar">
     <div class="cart-header">
         <h3>✦ Tu selección ✦</h3>
-        <button class="close-cart" id="closeCartBtn">✕</button>
+        <button class="close-cart" id="close-cart-btn">✕</button>
     </div>
-    <div id="cartItems" class="cart-items"><div class="loading">Cargando...</div></div>
+    <div id="cart-items" class="cart-items"><div class="loading">Cargando...</div></div>
     <div class="cart-footer">
-        <div class="cart-total"><span>Total</span><span id="cartTotal">€0</span></div>
-        <button id="whatsappBtn" class="social-btn" style="width:100%; background:#25D366; border-color:#25D366; color:white">💬 Consultar por WhatsApp</button>
+        <div class="cart-total"><span>Total</span><span id="cart-total">€0</span></div>
+        <button id="whatsapp-btn" class="social-btn" style="width:100%; background:#25D366; border-color:#25D366; color:white">💬 Consultar por WhatsApp</button>
         <small style="display: block; text-align: center; margin-top: 0.8rem; color: var(--text-muted);">Se abrirá WhatsApp con tu pedido</small>
     </div>
 </div>
@@ -1325,29 +1326,29 @@
                 <a href="#contacto">Contacto</a>
             </nav>
             <div class="header-actions">
-                <button id="wishlistBtn" class="header-icon">
+                <button id="wishlist-btn" class="header-icon">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                     </svg>
-                    <span id="wishlistCount" class="badge">0</span>
+                    <span id="wishlist-count" class="badge">0</span>
                 </button>
-                <button id="cartBtn" class="header-icon">
+                <button id="cart-btn" class="header-icon">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="9" cy="21" r="1"/>
                         <circle cx="20" cy="21" r="1"/>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                     </svg>
-                    <span id="cartCount" class="badge">0</span>
+                    <span id="cart-count" class="badge">0</span>
                 </button>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span id="userNameDisplay" class="user-name"></span>
-                    <button id="loginBtn" class="header-icon">
+                    <span id="user-name-display" class="user-name"></span>
+                    <button id="login-btn" class="header-icon">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
                     </button>
-                    <button id="logoutBtn" class="header-icon" style="display: none;">
+                    <button id="logout-btn" class="header-icon" style="display: none;">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                             <polyline points="16 17 21 12 16 7"/>
@@ -1419,12 +1420,12 @@
                 Calzado
             </button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos..." aria-label="Buscar productos">
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar productos..." aria-label="Buscar productos">
             </div>
         </div>
 
         <!-- PRODUCT GRID -->
-        <div id="productGrid" class="product-grid">
+        <div id="product-grid" class="product-grid">
             <div class="loading">Cargando productos...</div>
         </div>
         <div id="paginationControls" class="pagination-container"></div>

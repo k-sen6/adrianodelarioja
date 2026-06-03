@@ -51,14 +51,21 @@ export async function loginUser(name: string, phone: string): Promise<UserSessio
     }, { onConflict: 'id' });
 
     if (error) {
-      throw new Error('Error al guardar usuario');
+      // If upsert failed (e.g., missing columns in DB), try a simpler insert
+      const { error: insertError } = await supabase()
+        .from('users')
+        .insert({ id: userId, name: cleanName, phone: cleanPhone });
+
+      if (insertError) {
+        throw new Error('Error al guardar usuario');
+      }
     }
 
     persistUser(user);
     currentUser = user;
     return user;
-  } catch {
-    throw new Error('Error al iniciar sesión');
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : 'Error al iniciar sesión');
   }
 }
 
@@ -77,15 +84,16 @@ export async function loadSession(): Promise<UserSession | null> {
     if (!saved) return null;
 
     const parsed = JSON.parse(saved) as UserSession;
-    if (!parsed.session_token) {
+    if (!parsed.id) {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
 
+    // Try to validate session by id; session_token column may not exist
     const { data, error } = await supabase()
       .from('users')
       .select('id, name, phone')
-      .eq('session_token', parsed.session_token)
+      .eq('id', parsed.id)
       .single();
 
     if (error || !data) {
