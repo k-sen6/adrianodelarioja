@@ -40,7 +40,7 @@ export async function addToCart(productId: number): Promise<boolean> {
   try {
     const { error } = await supabase()
       .from('cart')
-      .insert({ user_id: user.id, product_id: productId });
+      .insert({ user_id: user.id, product_id: productId, quantity: 1 });
 
     if (error) return false;
 

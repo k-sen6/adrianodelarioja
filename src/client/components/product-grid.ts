@@ -4,6 +4,7 @@ import { addToCart, getCartCount } from '../lib/cart';
 import { toggleWishlist, isInWishlist, getWishlistCount } from '../lib/wishlist';
 import { getCurrentUser } from '../lib/auth';
 import { showNotification } from '../lib/notifications';
+import { updateCartUI } from './cart-sidebar';
 import type { Product, FilterCategory } from '../types';
 
 let allProducts: Product[] = [];
@@ -149,6 +150,7 @@ function createProductCard(product: Product): HTMLElement {
     if (success) {
       showNotification(`✨ ${product.name} añadido`);
       updateCartCount();
+      updateCartUI();
     } else {
       showNotification('⚠️ El producto ya está en el carrito');
     }
