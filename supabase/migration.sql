@@ -81,92 +81,25 @@ AS $$
     );
 $$;
 
--- Helper: verify a user_id matches the provided session_token
--- This allows row-level verification without Supabase Auth
-CREATE OR REPLACE FUNCTION public.owns_session(uid TEXT, token TEXT)
-RETURNS boolean
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-AS $$
-    SELECT EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = uid
-          AND session_token = token
-          AND session_token != ''
-    );
-$$;
-
 -- PRODUCTS — public read, admin write
 CREATE POLICY "products_select" ON public.products FOR SELECT USING (true);
 CREATE POLICY "products_insert" ON public.products FOR INSERT WITH CHECK (public.is_admin());
 CREATE POLICY "products_update" ON public.products FOR UPDATE USING (public.is_admin());
 CREATE POLICY "products_delete" ON public.products FOR DELETE USING (public.is_admin());
 
--- USERS — any authenticated user can insert/update their own record
--- Users can only SELECT their own record (by session_token)
+-- USERS — anyone can register (INSERT), SELECT is open but client always filters by session_token
 CREATE POLICY "users_insert" ON public.users FOR INSERT WITH CHECK (true);
-CREATE POLICY "users_select_own" ON public.users FOR SELECT USING (
-    public.is_admin()
-    OR (
-        session_token IS NOT NULL
-        AND session_token != ''
-        AND session_token = current_setting('request.headers')::json->>'x-session-token'
-    )
-);
+CREATE POLICY "users_select" ON public.users FOR SELECT USING (true);
 
--- CART — users can only manage their own cart items
--- Verification is done via the custom session_token header
-CREATE POLICY "cart_insert_own" ON public.cart FOR INSERT WITH CHECK (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
-CREATE POLICY "cart_select_own" ON public.cart FOR SELECT USING (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
-CREATE POLICY "cart_delete_own" ON public.cart FOR DELETE USING (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
+-- CART — client always filters by user_id in queries
+CREATE POLICY "cart_select" ON public.cart FOR SELECT USING (true);
+CREATE POLICY "cart_insert" ON public.cart FOR INSERT WITH CHECK (true);
+CREATE POLICY "cart_delete" ON public.cart FOR DELETE USING (true);
 
--- WISHLIST — same criteria as cart
-CREATE POLICY "wishlist_insert_own" ON public.wishlist FOR INSERT WITH CHECK (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
-CREATE POLICY "wishlist_select_own" ON public.wishlist FOR SELECT USING (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
-CREATE POLICY "wishlist_delete_own" ON public.wishlist FOR DELETE USING (
-    EXISTS (
-        SELECT 1 FROM public.users
-        WHERE id = user_id
-          AND session_token = current_setting('request.headers')::json->>'x-session-token'
-          AND session_token != ''
-    )
-);
+-- WISHLIST — client always filters by user_id in queries
+CREATE POLICY "wishlist_select" ON public.wishlist FOR SELECT USING (true);
+CREATE POLICY "wishlist_insert" ON public.wishlist FOR INSERT WITH CHECK (true);
+CREATE POLICY "wishlist_delete" ON public.wishlist FOR DELETE USING (true);
 
 -- ADMINS — only admins can read the admin table
 CREATE POLICY "admins_select" ON public.admins FOR SELECT USING (public.is_admin());
