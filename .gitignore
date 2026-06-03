@@ -1,12 +1,14 @@
-# Archivo de configuración inyectado por GitHub Actions (contiene secrets)
-config.js
-
-# OS files
+node_modules/
+dist/
+.env
+*.local
 .DS_Store
 Thumbs.db
-
-# Editor
-.vscode/
-.idea/
 *.swp
 *.swo
+.vscode/
+.idea/
+coverage/
+public/config.js
+llm_proxy.py
+config.example.js

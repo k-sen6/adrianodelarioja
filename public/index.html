@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Adriano de la Rioja · Atelier de Alta Costura · La Habana</title>
+  <meta name="description" content="Moda de autor escultórica. Prendas y calzado hechos a mano en La Habana Vieja. Diseño de vanguardia y acabados artesanales.">
+  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark light">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Adriano de la Rioja">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta property="og:title" content="Adriano de la Rioja · Atelier de Alta Costura">
+  <meta property="og:description" content="Moda de autor hecha a mano en La Habana Vieja.">
+  <meta property="og:image" content="https://i.postimg.cc/6QSkBPyF/Hero.webp">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://i.postimg.cc/Px55JHQr/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/6qS3FPR3/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/styles/variables.css">
+  <link rel="stylesheet" href="../src/styles/base.css">
+  <link rel="stylesheet" href="../src/styles/layout.css">
+  <link rel="stylesheet" href="../src/styles/components.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2.107.0" integrity="sha384-CQbEv3UOeYwlaBLdPF5KqEagCP39Q1KpvJC6Gwa3UGjZAwMvpA+0TFxSSnrgb4MX" crossorigin="anonymous"></script>
+  <script type="module" src="../src/client/main.ts"></script>
+</head>
+<body>
+  <div id="loading-placeholder" class="loading-placeholder">
+    <div class="loader-logo">
+      <img src="https://i.postimg.cc/bvjGz456/android-chrome-192x192.png" alt="Adriano de la Rioja" width="100" height="100">
+      <p>ADRIANO DE LA RIOJA</p>
+    </div>
+  </div>
+
+  <div id="custom-cursor" class="custom-cursor"></div>
+  <div id="scroll-progress" class="scroll-progress"></div>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+  <div id="lightbox" class="lightbox">
+    <button id="lightbox-close" class="lightbox-close" aria-label="Cerrar">&times;</button>
+    <button id="lightbox-prev" class="lightbox-prev" aria-label="Anterior">&#8249;</button>
+    <button id="lightbox-next" class="lightbox-next" aria-label="Siguiente">&#8250;</button>
+    <img id="lightbox-img" src="" alt="">
+    <div id="lightbox-counter" class="lightbox-counter"></div>
+  </div>
+
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <h3>&#10022; Identif&iacute;cate &#10022;</h3>
+      <p>Tu nombre y tel&eacute;fono para guardar tu selecci&oacute;n</p>
+      <input type="text" id="login-name" placeholder="Tu nombre" autocomplete="name" maxlength="100">
+      <input type="tel" id="login-phone" placeholder="Tu n&uacute;mero de WhatsApp" autocomplete="tel" maxlength="20">
+      <button id="submit-login-btn">Continuar &rarr;</button>
+      <div id="login-error" class="modal-error"></div>
+      <small class="modal-small">Sin contrase&ntilde;as. Solo necesitamos tus datos para contactarte.</small>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <div id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-header">
+      <h3>&#10022; Tu selecci&oacute;n &#10022;</h3>
+      <button id="close-cart-btn" class="close-cart" aria-label="Cerrar carrito">&times;</button>
+    </div>
+    <div id="cart-items" class="cart-items">
+      <div class="loading">Cargando...</div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cart-total">&euro;0</span>
+      </div>
+      <button id="whatsapp-btn" class="whatsapp-btn">&#128172; Consultar por WhatsApp</button>
+      <small>Se abrir&aacute; WhatsApp con tu pedido</small>
+    </div>
+  </div>
+
+  <div id="sticky-header" class="sticky-header">
+    <div class="container">
+      <header>
+        <div class="logo">
+          <h1>Adriano de la Rioja</h1>
+          <p>LA HABANA &middot; ATELIER</p>
+        </div>
+        <button id="menu-icon" class="menu-icon" aria-label="Abrir men&uacute;">&#9776;</button>
+        <nav id="nav-links" class="nav-links">
+          <a href="#inicio" data-nav>Inicio</a>
+          <a href="#historia" data-nav>Trayectoria</a>
+          <a href="#atelier" data-nav>El oficio</a>
+          <a href="#editorial" data-nav>Editorial</a>
+          <a href="#contacto" data-nav>Contacto</a>
+        </nav>
+        <div class="header-actions">
+          <button id="wishlist-btn" class="header-icon" aria-label="Favoritos">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span id="wishlist-count" class="badge">0</span>
+          </button>
+          <button id="cart-btn" class="header-icon" aria-label="Carrito">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span id="cart-count" class="badge">0</span>
+          </button>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span id="user-name-display" class="user-name"></span>
+            <button id="login-btn" class="header-icon" aria-label="Iniciar sesi&oacute;n">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </button>
+            <button id="logout-btn" class="header-icon" aria-label="Cerrar sesi&oacute;n" style="display: none;">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <section id="inicio" class="hero-section">
+      <div class="hero-image-wrapper">
+        <div id="hero-placeholder" class="hero-placeholder">
+          <img src="https://i.postimg.cc/bvjGz456/android-chrome-192x192.png" alt="Cargando..." width="100" height="100">
+        </div>
+        <img id="hero-image" class="hero-image" src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Adriano de la Rioja Atelier" fetchpriority="high">
+      </div>
+      <div class="hero-overlay">
+        <div class="container">
+          <div class="hero-credit">Obispo #508 &middot; El taller &middot; Desde 2020</div>
+          <div class="typed-wrapper">
+            <span id="typed-text" class="typed-text"></span>
+            <span class="typed-cursor"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>La nueva <span class="gold-text">silueta</span></h2>
+        <div class="gold-divider"></div>
+        <p>L&iacute;neas puras, tejidos que se transforman</p>
+      </div>
+
+      <p class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: var(--text-secondary);">
+        Cada prenda y calzado nace del gesto preciso del artesano, pensado para el ritmo de la ciudad contempor&aacute;nea.
+      </p>
+
+      <div class="filters-bar reveal">
+        <button class="filter-btn active" data-filter="all" data-filter-btn>Todos</button>
+        <button class="filter-btn" data-filter="vestidos" data-filter-btn>Vestidos</button>
+        <button class="filter-btn" data-filter="chaquetas" data-filter-btn>Chaquetas</button>
+        <button class="filter-btn" data-filter="calzado" data-filter-btn>Calzado</button>
+        <div class="search-wrapper">
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar productos..." aria-label="Buscar productos" maxlength="100">
+        </div>
+      </div>
+
+      <div id="product-grid" class="product-grid">
+        <div class="loading">Cargando productos...</div>
+      </div>
+      <div id="pagination-controls" class="pagination-container"></div>
+
+      <div class="story-about" id="historia">
+        <div class="story-card reveal">
+          <h3>&#8987; Trayectoria</h3>
+          <p>Adriano de la Rioja abri&oacute; sus puertas en <strong class="gold-text">2020</strong> en el coraz&oacute;n de La Habana Vieja. <strong class="gold-text">Seis a&ntilde;os despu&eacute;s</strong>, el taller sigue fiel a su esencia: devolverle el alma a la moda, con prendas y calzado que dialogan con la tradici&oacute;n zapatera cubana y las tendencias internacionales.</p>
+          <p>Cada puntada, un gesto de precisi&oacute;n. Cada material, una elecci&oacute;n consciente. Esto no es moda pasajera: es la manera en que entendemos el vestir contempor&aacute;neo.</p>
+        </div>
+        <div class="about-card reveal">
+          <h3>&#10022; El estudio</h3>
+          <p>Somos un taller de moda &eacute;tica con ra&iacute;ces cubanas y mirada global. Cada pieza incluye seguimiento personalizado. Los tejidos son fibras naturales y cueros de curtido vegetal, seleccionados por su tacto y durabilidad.</p>
+          <p>Dise&ntilde;o honesto, producci&oacute;n a la vista, materiales que cuentan historias. <span class="gold-text">Dise&ntilde;o &uacute;nico &middot; Producci&oacute;n consciente</span></p>
+        </div>
+      </div>
+
+      <div class="atelier-premium reveal" id="atelier">
+        <div class="atelier-image">
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="El oficio" loading="lazy">
+        </div>
+        <div class="atelier-text">
+          <h3>El oficio contempor&aacute;neo</h3>
+          <p>En cada prenda y calzado confluyen el dise&ntilde;o de vanguardia y la tradici&oacute;n artesanal. Trabajamos con cortes precisos, montajes manuales y acabados que se obtienen con ceras naturales y tintes bot&aacute;nicos.</p>
+          <p>Ofrecemos hormas personalizadas y ajustes a medida, porque la verdadera exclusividad est&aacute; en el detalle. Cada colecci&oacute;n es un di&aacute;logo entre el taller, los materiales nobles y la persona que va a vestir la pieza.</p>
+          <p><span class="gold-text">Dise&ntilde;o &uacute;nico &middot; Producci&oacute;n consciente &middot; Acabados artesanales</span></p>
+        </div>
+      </div>
+
+      <div class="stats-premium reveal" id="stats-section">
+        <div class="stats-container">
+          <div>
+            <span class="stat-number" data-target="6">0</span>
+            <span class="stat-label">a&ntilde;os de taller</span>
+          </div>
+          <div>
+            <span class="stat-number" data-target="24">0</span>
+            <span class="stat-label">estaciones de oficio</span>
+          </div>
+          <div>
+            <span class="stat-number" data-target="150">0</span>
+            <span class="stat-label">reparaciones garantizadas</span>
+          </div>
+        </div>
+        <p class="stat-quote">&ldquo;No hacemos piezas, hacemos compa&ntilde;eros de vida&rdquo;</p>
+      </div>
+
+      <div class="section-title reveal" id="editorial">
+        <h2>Editorial</h2>
+        <div class="gold-divider"></div>
+        <p>La calle como pasarela</p>
+      </div>
+
+      <div class="gallery-premium reveal">
+        <div class="gallery-item">
+          <div class="gallery-overlay"></div>
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Editorial 1" loading="lazy">
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-overlay"></div>
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Editorial 2" loading="lazy">
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-overlay"></div>
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Editorial 3" loading="lazy">
+        </div>
+      </div>
+
+      <div class="section-title reveal">
+        <h2>Detalles del <span class="gold-text">oficio</span></h2>
+        <div class="gold-divider"></div>
+        <p>Cada puntada es una firma</p>
+      </div>
+
+      <div class="gallery-premium reveal">
+        <div class="gallery-item">
+          <div class="gallery-overlay"></div>
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Detalle 1" loading="lazy">
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-overlay"></div>
+          <img src="https://i.postimg.cc/6QSkBPyF/Hero.webp" alt="Detalle 2" loading="lazy">
+        </div>
+      </div>
+
+      <div class="signature reveal">
+        <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Adriano de la Rioja">
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="var(--gold)" font-family="Georgia, serif" font-size="18" font-style="italic" letter-spacing="3">Adriano de la Rioja</text>
+        </svg>
+      </div>
+
+      <div class="social-connect reveal" id="contacto">
+        <h3>Conecta con el taller</h3>
+        <div class="social-buttons">
+          <a id="whatsapp-channel" href="#" class="social-btn" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Canal de WhatsApp
+          </a>
+          <a href="https://www.instagram.com" class="social-btn" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            Instagram &middot; Oficio
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-premium reveal">
+        <p>
+          <a href="https://maps.google.com/?q=Obispo+508+La+Habana" class="location-link" target="_blank" rel="noopener noreferrer">
+            La Inecita &middot; 508 Obispo, La Habana
+          </a>
+        </p>
+        <p>
+          <span class="hours-badge">Todos los d&iacute;as &middot; 9:00 AM &mdash; 6:00 PM</span>
+        </p>
+        <p>
+          <a href="tel:+5350979465">+53 50979465</a>
+        </p>
+      </div>
+    </div>
+
+    <button id="back-to-top" class="back-to-top" aria-label="Volver arriba">&uarr;</button>
+
+    <footer>
+      <div class="container">
+        <p class="footer-quote">&#10022; Vestir con oficio, durar sin prisa &#10022;</p>
+        <p class="footer-credit">Adriano de la Rioja &middot; Atelier fundado en La Habana &middot; 2020</p>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // CSP-friendly runtime config injection
+    window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
+  </script>
+</body>
+</html>

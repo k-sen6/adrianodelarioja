@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin · Adriano de la Rioja</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/styles/admin.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2.107.0" integrity="sha384-CQbEv3UOeYwlaBLdPF5KqEagCP39Q1KpvJC6Gwa3UGjZAwMvpA+0TFxSSnrgb4MX" crossorigin="anonymous"></script>
+  <script type="module" src="../src/client/admin.ts"></script>
+</head>
+<body class="admin-page">
+  <div class="admin-container" id="app">
+    <div id="login-panel" class="login-panel">
+      <div class="login-card">
+        <h2>&#128274; Acceso Administrador</h2>
+        <input type="email" id="admin-email" placeholder="Email" autocomplete="email">
+        <input type="password" id="admin-password" placeholder="Contrase&ntilde;a" autocomplete="current-password">
+        <button id="admin-login-btn" class="login-btn">Ingresar</button>
+        <div id="login-error" class="login-error"></div>
+        <div id="rate-limit-msg" class="rate-limit-msg">Demasiados intentos. Espera 30 segundos.</div>
+      </div>
+    </div>
+
+    <div id="admin-content" class="admin-content">
+      <div class="admin-header">
+        <h1>&#10022; Panel de Administraci&oacute;n &#10022;</h1>
+        <button id="admin-logout-btn" class="admin-logout-btn">Cerrar Sesi&oacute;n</button>
+      </div>
+
+      <div class="admin-stats">
+        <div class="stat-card">
+          <h3>Total Productos</h3>
+          <div class="number" id="total-products">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Pedidos Pendientes</h3>
+          <div class="number" id="total-carts">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Usuarios Registrados</h3>
+          <div class="number" id="total-users">0</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>&#10133; A&ntilde;adir Nuevo Producto</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prod-name">Nombre</label>
+            <input type="text" id="prod-name" placeholder="Ej: Vestido de Gala" maxlength="200">
+          </div>
+          <div class="form-group">
+            <label for="prod-price">Precio (&euro;)</label>
+            <input type="number" id="prod-price" placeholder="Ej: 299" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prod-category">Categor&iacute;a</label>
+            <select id="prod-category">
+              <option value="vestidos">Vestidos</option>
+              <option value="chaquetas">Chaquetas</option>
+              <option value="calzado">Calzado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="prod-image">URL Imagen</label>
+            <input type="text" id="prod-image" placeholder="https://i.postimg.cc/..." maxlength="500">
+          </div>
+        </div>
+        <button id="add-product-btn" class="btn-primary">&#10024; A&ntilde;adir Producto</button>
+      </div>
+
+      <div class="form-section">
+        <h2>&#128203; Lista de Productos</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Categor&iacute;a</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="products-list"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>&#128230; Pedidos Recientes</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Tel&eacute;fono</th>
+                <th>Productos</th>
+                <th>Total</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="carts-list"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-notification" class="admin-notification"></div>
+
+  <div id="edit-modal" class="admin-modal">
+    <div class="admin-modal-content">
+      <h3>&#9998; Editar Producto</h3>
+      <div class="form-group">
+        <label for="edit-name">Nombre</label>
+        <input type="text" id="edit-name" maxlength="200">
+      </div>
+      <div class="form-group">
+        <label for="edit-price">Precio (&euro;)</label>
+        <input type="number" id="edit-price" min="0" step="0.01">
+      </div>
+      <div class="edit-actions">
+        <button class="btn-primary" id="save-edit-btn">&#128190; Guardar</button>
+        <button class="btn-cancel" id="cancel-edit-btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-modal" class="admin-modal">
+    <div class="delete-modal-content">
+      <h3>&#128465; &iquest;Eliminar producto?</h3>
+      <p>Esta acci&oacute;n no se puede deshacer.</p>
+      <div class="delete-actions">
+        <button class="btn-confirm-delete" id="confirm-delete-btn">S&iacute;, eliminar</button>
+        <button class="btn-cancel" id="cancel-delete-btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
+  </script>
+</body>
+</html>

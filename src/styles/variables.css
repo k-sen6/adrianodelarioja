@@ -1,0 +1,43 @@
+:root {
+  --bg-primary: #050505;
+  --bg-secondary: #0A0A0A;
+  --bg-tertiary: #0F0F0F;
+  --gold: #D4AF37;
+  --gold-dark: #B8960C;
+  --gold-light: #E8D174;
+  --text-primary: #EAEAEA;
+  --text-secondary: #C0C0C0;
+  --text-muted: #8A8A8A;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --whatsapp: #25D366;
+  --transition-smooth: cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  --transition-luxury: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --header-height: 90px;
+  --cursor-size: 32px;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #FAFAFA;
+    --bg-secondary: #F5F5F5;
+    --bg-tertiary: #EDEDED;
+    --text-primary: #1A1A1A;
+    --text-secondary: #2A2A2A;
+    --text-muted: #555555;
+    --gold: #C4A030;
+    --gold-dark: #A08020;
+    --gold-light: #D4B040;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-smooth: none;
+    --transition-luxury: none;
+    --transition-bounce: none;
+  }
+}

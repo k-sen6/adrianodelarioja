@@ -1,88 +1,206 @@
 # Adriano de la Rioja · Atelier de Alta Costura
 
-Sitio web del atelier de moda **Adriano de la Rioja**, ubicado en La Habana Vieja. Catálogo de prendas y calzado hechos a mano, con carrito de compras, panel de administración y pedidos vía WhatsApp.
+[![Deploy](https://github.com/k-sen6/adrianodelarioja/actions/workflows/deploy.yml/badge.svg)](https://github.com/k-sen6/adrianodelarioja/actions/workflows/deploy.yml)
 
-## Stack
+Sitio web oficial del atelier de alta costura **Adriano de la Rioja**, ubicado en Obispo #508, La Habana Vieja. Moda de autor escultórica con acabados artesanales.
 
-- **Frontend:** HTML + CSS (vanilla) con diseño oscuro/lujo
-- **Backend:** Supabase (base de datos, autenticación)
-- **CI/CD:** GitHub Actions (inyección segura de claves via Secrets)
-- **Despliegue:** GitHub Pages
+## ✨ Stack Tecnológico
 
-## Estructura
+| Capa         | Tecnología                                                           |
+|-------------|----------------------------------------------------------------------|
+| Frontend    | TypeScript 5 + Vite 6                                                |
+| BaaS        | Supabase (Auth, PostgreSQL, RLS)                                     |
+| CSS         | Arquitectura modular (variables, base, layout, componentes, admin)   |
+| Testing     | Vitest + jsdom                                                       |
+| Despliegue  | GitHub Pages + GitHub Actions                                        |
+| Proxy CDN   | Cloudflare Worker (para headers de seguridad faltantes)              |
+| Contenedor  | Docker + Nginx (para VPS, opcional)                                  |
+
+## 🏛️ Arquitectura
 
 ```
-├── index.html          # Página principal
-├── admin.html          # Panel de administración
-├── config.example.js   # Plantilla de configuración local
-├── js/
-│   ├── supabase-client.js  # Cliente Supabase
-│   ├── products.js         # Productos + paginación + búsqueda
-│   ├── cart.js             # Carrito de compras
-│   ├── auth.js             # Autenticación de usuarios
-│   ├── ui.js               # Notificaciones con textContent (XSS-safe)
-│   ├── main.js             # Orquestador principal
-│   ├── helpers.js          # Utilidades compartidas (escapeHtml)
-│   └── config.js           # Constantes públicas
-├── Note                # Historial de correcciones de seguridad
-└── .github/workflows/
-    └── deploy.yml      # Inyecta secrets via GitHub Actions
+public/                          ← Raíz de Vite
+├── index.html                   ← Sitio público (CSP inline-safe)
+├── admin.html                   ← Panel admin (CSP inline-safe)
+└── config.js                    ← Generado por CI (nunca en repo)
+
+src/
+├── client/                      ← Código fuente TypeScript
+│   ├── main.ts                  ← Entry point público
+│   ├── admin.ts                 ← Entry point admin
+│   ├── global.d.ts              ← Tipos globales (Supabase, ventana)
+│   ├── types.ts                 ← Tipos compartidos
+│   ├── components/              ← Componentes UI
+│   │   ├── header.ts            ← Navbar + scroll
+│   │   ├── hero.ts              ← Hero + typing effect
+│   │   ├── product-grid.ts      ← Grid + filtros + paginación
+│   │   ├── cart-sidebar.ts      ← Carrito lateral
+│   │   ├── auth.ts              ← Login modal + UI
+│   │   ├── lightbox.ts          ← Galería lightbox
+│   │   ├── stats.ts             ← Contadores animados
+│   │   ├── scroll-effects.ts    ← Scroll reveal, progress bar, loader
+│   │   └── custom-cursor.ts     ← Cursor personalizado
+│   ├── lib/                     ← Servicios
+│   │   ├── supabase.ts          ← Cliente Supabase singleton
+│   │   ├── auth.ts              ← Auth usuarios (session_token)
+│   │   ├── products.ts          ← CRUD productos
+│   │   ├── cart.ts              ← Carrito + Supabase
+│   │   ├── wishlist.ts          ← Favoritos + Supabase
+│   │   └── notifications.ts     ← Toast notifications
+│   └── utils/                   ← Utilidades
+│       ├── dom.ts               ← Manipulación DOM segura
+│       └── sanitize.ts          ← Sanitización de entrada
+
+src/styles/                      ← CSS modular (todo externo)
+├── variables.css                ← Tokens de diseño
+├── base.css                     ← Reset + tipografía
+├── layout.css                   ← Grid, header, hero, footer
+├── components.css               ← Cards, carrito, lightbox, etc.
+└── admin.css                    ← Estilos del panel admin
+
+tests/                           ← Tests Vitest
+├── sanitize.test.ts             ← escapeHtml + validatePrice
+└── dom.test.ts                  ← createElement, clearElement, setText
+
+supabase/
+└── migration.sql                ← Esquema DB + políticas RLS
 ```
 
-## Desarrollo local
+### Patrón: Zero-Trust DOM
 
-1. Clona el repo
-2. Copia `config.example.js` como `config.js`
-3. Completa tus claves de Supabase en `config.js`
-4. Sirve con cualquier servidor estático:
+Ninguna cadena de texto ingresada por el usuario se inserta como HTML. Toda la manipulación del DOM usa:
+
+- `document.createElement()` en lugar de `innerHTML`
+- `element.textContent` en lugar de `innerHTML`
+- `setAttribute()` en lugar de cadenas de atributos
+- `addEventListener()` en lugar de `onclick="..."`
+
+## 🔒 Seguridad
+
+### Content Security Policy (CSP)
+
+```
+default-src 'self';
+script-src 'self' https://unpkg.com https://*.supabase.co;
+style-src 'self' https://fonts.googleapis.com;
+img-src 'self' https://i.postimg.cc https://placehold.co data:;
+font-src https://fonts.gstatic.com;
+connect-src https://*.supabase.co wss://*.supabase.co;
+frame-src 'none';
+base-uri 'self';
+form-action 'self'
+```
+
+- **Sin** `'unsafe-inline'` — todo JS/CSS externo tiene SRI hash
+- **Sin** `'unsafe-eval'` — no se usa `eval()` ni `new Function()`
+- **Sin** `onclick` — todos los eventos via `addEventListener`
+
+### Zero Trust Architecture (RLS)
+
+Las políticas de Supabase Row Level Security verifican `session_token` en cada operación:
+
+```sql
+-- Los clientes solo leen/insertan filas donde user_id = su session_token
+CREATE POLICY "cart_client_access" ON cart
+  FOR ALL USING (user_id IN (
+    SELECT id FROM users WHERE session_token = current_setting('app.session_token', true)
+  ));
+```
+
+### Protecciones adicionales
+
+- **SRI hashes** para scripts externos (Supabase SDK)
+- **Rate limiting** en login admin (5 intentos, bloqueo 30s)
+- **Sanitización** de entrada: `sanitizeText()`, `validatePrice()`
+- **Headers HTTP** via Cloudflare Worker (X-Frame-Options, Permissions-Policy)
+- **Sin secrets en repo** — configuración inyectada por GitHub Actions
+
+## 🚀 Desarrollo Local
 
 ```bash
-npx serve .
-# o
-python3 -m http.server 8000
+# 1. Clonar
+git clone https://github.com/k-sen6/adrianodelarioja.git
+cd adrianodelarioja
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Copiar y configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus credenciales de Supabase
+
+# 4. Iniciar servidor de desarrollo
+npm run dev
+# Abre en http://localhost:3000
+
+# 5. TypeScript check
+npm run typecheck
+
+# 6. Tests
+npm test
+
+# 7. Build de producción
+npm run build
 ```
 
-## Seguridad
+## 🚢 Despliegue
 
-### Credenciales
+### GitHub Pages (automático)
 
-Las claves de Supabase y el número de WhatsApp se inyectan mediante **GitHub Actions Secrets** en cada `push` a `main`. El archivo `config.js` está en `.gitignore` y nunca se sube al repositorio.
+Cada push a `main` ejecuta el workflow `.github/workflows/deploy.yml`:
 
-Para configurar los secrets en tu repositorio:
-1. Ve a **Settings → Secrets and variables → Actions**
-2. Agrega los siguientes secrets:
-   - `SUPABASE_URL` — URL de tu proyecto Supabase
-   - `SUPABASE_ANON_KEY` — Anon key de Supabase
-   - `WHATSAPP_NUMBER` — Número de WhatsApp (opcional)
+1. Checkout del código
+2. Inyección de configuración (secrets → `public/config.js`)
+3. `npm ci` + `npm run build`
+4. Subida a GitHub Pages
 
-### Medidas implementadas
+**Secrets requeridos** (Settings → Secrets and variables → Actions):
+| Secret | Descripción |
+|--------|------------|
+| `SUPABASE_URL` | URL del proyecto Supabase |
+| `SUPABASE_ANON_KEY` | Anon key pública de Supabase |
+| `WHATSAPP_NUMBER` | Número WhatsApp para pedidos |
 
-| Medida | Descripción |
-|---|---|
-| **CSP** | Content Security Policy en index.html y admin.html |
-| **SRI** | Integrity hashes en scripts CDN de Supabase |
-| **XSS** | escapeHtml() compartido en helpers.js; textContent en lugar de innerHTML |
-| **Auth** | Verificación server-side de session_token contra Supabase |
-| **Rate limiting** | Control de intentos de login en admin.html |
-| **Secrets** | API keys y WhatsApp number inyectados via GitHub Actions Secrets |
-| **Git history** | Historial limpiado con git filter-branch (eliminadas keys de commits antiguos) |
+### Docker / VPS (opcional)
 
-## Panel Admin
+```bash
+docker compose up -d
+# Sirve en http://localhost:8080 con headers de seguridad
+```
 
-Accede a `/admin.html` e inicia sesión con el email y contraseña configurados en Supabase Auth.
+### Cloudflare Worker (recomendado)
 
-## Funcionalidades
+Desplegar `cloudflare/headers-worker.js` en Cloudflare Workers para añadir headers de seguridad que GitHub Pages no permite configurar.
 
-- Catálogo de productos con filtros y búsqueda
-- Paginación (6 productos por página)
-- Carrito de compras persistente
-- Wishlist (favoritos)
-- Pedidos vía WhatsApp
-- Panel admin con CRUD de productos
-- Modo oscuro/claro automático
-- Diseño responsive
-- Animaciones y transiciones
+## 📦 Scripts Disponibles
 
-## Licencia
+| Comando | Descripción |
+|---------|------------|
+| `npm run dev` | Servidor de desarrollo Vite |
+| `npm run build` | TypeScript check + build Vite |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | `vitest run` |
 
-Uso interno del taller.
+## 📁 Estructura de Base de Datos (Supabase)
+
+Ver `supabase/migration.sql` para esquema completo. Tablas:
+
+- **products** — Catálogo (id, name, price, image_url, category)
+- **users** — Clientes (id, name, phone, session_token, last_login)
+- **cart** — Carritos (id, user_id, product_id, created_at)
+- **wishlist** — Favoritos (id, user_id, product_id)
+- **profiles** — Admins (vinculado a Supabase Auth)
+
+## ⚠️ Limitaciones Conocidas
+
+Sin un servidor backend propio, hay 3 headers HTTP que GitHub Pages no permite enviar:
+
+| Header | Mitigación |
+|--------|-----------|
+| `X-Frame-Options` | Cloudflare Worker |
+| `Permissions-Policy` | Cloudflare Worker |
+| CSRF tokens | SameSite cookies + CSP |
+
+## 📄 Licencia
+
+Todos los derechos reservados © Adriano de la Rioja.
