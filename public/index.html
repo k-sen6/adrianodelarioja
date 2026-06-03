@@ -9,7 +9,7 @@
   <meta name="color-scheme" content="dark light">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Adriano de la Rioja">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:title" content="Adriano de la Rioja · Atelier de Alta Costura">
   <meta property="og:description" content="Moda de autor hecha a mano en La Habana Vieja.">
   <meta property="og:image" content="https://i.postimg.cc/6QSkBPyF/Hero.webp">
@@ -299,10 +299,5 @@
       </div>
     </footer>
   </main>
-
-  <script>
-    // CSP-friendly runtime config injection
-    window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
-  </script>
 </body>
 </html>

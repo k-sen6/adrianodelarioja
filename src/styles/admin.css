@@ -288,6 +288,12 @@ td {
   border-bottom: 1px solid #333;
 }
 
+.empty-message {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
 th {
   color: #D4AF37;
   font-weight: 600;

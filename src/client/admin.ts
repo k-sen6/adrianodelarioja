@@ -229,7 +229,14 @@ async function loadProductsTable(): Promise<void> {
       tbody.appendChild(tr);
     }
   } catch {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Error al cargar productos</td></tr>';
+    tbody.textContent = '';
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 6;
+    td.className = 'empty-message';
+    td.textContent = 'Error al cargar productos';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
   }
 }
 
@@ -266,7 +273,14 @@ async function loadCarts(): Promise<void> {
     const data: Array<{ id: number; user_id: string; products: { name: string; price: number } | null; created_at: string | null }> = (rawData ?? []) as typeof data;
 
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay pedidos aún</td></tr>';
+      tbody.textContent = '';
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'empty-message';
+      td.textContent = 'No hay pedidos aún';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
 
@@ -294,25 +308,26 @@ async function loadCarts(): Promise<void> {
         : '-';
 
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.phone)}</td><td>${escapeHtml(productNames || '-')}</td><td>€${total}</td><td>${date}</td>`;
+      const cells = [
+        user.name, user.phone, productNames || '-', `€${total}`, date,
+      ];
+      for (const text of cells) {
+        const td = document.createElement('td');
+        td.textContent = text;
+        tr.appendChild(td);
+      }
       tbody.appendChild(tr);
     }
   } catch {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Error al cargar pedidos</td></tr>';
+    tbody.textContent = '';
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 5;
+    td.className = 'empty-message';
+    td.textContent = 'Error al cargar pedidos';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
   }
-}
-
-function escapeHtml(str: string): string {
-  return String(str).replace(/[&<>"']/g, (m) => {
-    switch (m) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#x27;';
-      default: return m;
-    }
-  });
 }
 
 // ========== PRODUCT CRUD ==========
