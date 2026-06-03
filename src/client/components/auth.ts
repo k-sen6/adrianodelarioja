@@ -1,7 +1,7 @@
 import { qs, on } from '../utils/dom';
 import { loginUser, loadSession, logoutUser, getCurrentUser } from '../lib/auth';
 import { loadCart } from '../lib/cart';
-import { loadWishlist } from '../lib/wishlist';
+import { loadWishlist, getWishlistCount } from '../lib/wishlist';
 import { showNotification } from '../lib/notifications';
 import { updateCartUI } from './cart-sidebar';
 import { updateCartCount, updateWishlistCount } from './product-grid';
@@ -28,6 +28,20 @@ export async function initAuth(): Promise<void> {
     on(loginBtn, 'click', () => {
       loginModal.classList.add('active');
       if (errorSpan) errorSpan.textContent = '';
+    });
+  }
+
+  const wishlistBtn = qs('#wishlist-btn') as HTMLElement | null;
+  if (wishlistBtn) {
+    on(wishlistBtn, 'click', () => {
+      const user = getCurrentUser();
+      if (!user) {
+        showNotification('🔐 Inicia sesión para guardar favoritos');
+        if (loginModal) loginModal.classList.add('active');
+        return;
+      }
+      document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth' });
+      showNotification(`❤️ Tienes ${getWishlistCount()} favoritos`);
     });
   }
 

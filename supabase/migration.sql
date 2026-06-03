@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.cart (
     id BIGSERIAL PRIMARY KEY,
     user_id TEXT REFERENCES public.users(id) ON DELETE CASCADE,
     product_id BIGINT REFERENCES public.products(id) ON DELETE CASCADE,
+    quantity INTEGER DEFAULT 1,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

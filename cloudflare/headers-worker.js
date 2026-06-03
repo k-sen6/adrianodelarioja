@@ -1,6 +1,6 @@
-# Cloudflare Workers script to add security headers
-# Deploy via: wrangler deploy
-# Or add as Page Rule in Cloudflare Dashboard
+// Cloudflare Workers script to add security headers
+// Deploy via: wrangler deploy
+// Or add as Page Rule in Cloudflare Dashboard
 
 export default {
   async fetch(request, env) {
