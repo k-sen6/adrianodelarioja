@@ -94,16 +94,17 @@ export async function loadSession(): Promise<UserSession | null> {
     if (!saved) return null;
 
     const parsed = JSON.parse(saved) as UserSession;
-    if (!parsed.id) {
+    if (!parsed.id || !parsed.session_token) {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
 
-    // Try to validate session by id; session_token column may not exist
+    await setSessionToken(parsed.session_token);
+
     const { data, error } = await supabase()
       .from('users')
       .select('id, name, phone')
-      .eq('id', parsed.id)
+      .eq('session_token', parsed.session_token)
       .single();
 
     if (error || !data) {
@@ -111,7 +112,6 @@ export async function loadSession(): Promise<UserSession | null> {
       return null;
     }
 
-    await setSessionToken(parsed.session_token);
     currentUser = {
       ...parsed,
       name: (data as { name: string }).name,
