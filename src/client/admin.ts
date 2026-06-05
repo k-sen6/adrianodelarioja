@@ -201,7 +201,7 @@ async function loadProductsTable(): Promise<void> {
       tdName.textContent = p.name;
 
       const tdPrice = document.createElement('td');
-      tdPrice.textContent = `€${p.price}`;
+      tdPrice.textContent = `CUP ${p.price}`;
 
       const tdCat = document.createElement('td');
       tdCat.textContent = p.category;
@@ -309,7 +309,7 @@ async function loadCarts(): Promise<void> {
 
       const tr = document.createElement('tr');
       const cells = [
-        user.name, user.phone, productNames || '-', `€${total}`, date,
+        user.name, user.phone, productNames || '-', `CUP ${total}`, date,
       ];
       for (const text of cells) {
         const td = document.createElement('td');
@@ -378,17 +378,21 @@ function setupEditModal(): void {
 
       const nameInput = getEl<HTMLInputElement>('edit-name');
       const priceInput = getEl<HTMLInputElement>('edit-price');
+      const categorySelect = getEl<HTMLSelectElement>('edit-category');
+      const imageInput = getEl<HTMLInputElement>('edit-image');
 
-      if (!nameInput || !priceInput) return;
+      if (!nameInput || !priceInput || !categorySelect || !imageInput) return;
 
       const name = nameInput.value.trim();
       const price = parseFloat(priceInput.value);
+      const category = categorySelect.value;
+      const image_url = imageInput.value.trim();
 
       if (!name) { showError('❌ El nombre es requerido'); return; }
       if (!validatePrice(price)) { showError('❌ Precio inválido'); return; }
 
       try {
-        await updateProduct(editingProductId, { name, price });
+        await updateProduct(editingProductId, { name, price, category, image_url });
         showNotification('✅ Producto editado correctamente');
         closeEditModal();
         await loadProductsTable();
@@ -408,7 +412,7 @@ async function openEditModal(id: number): Promise<void> {
   try {
     const { data, error } = await supabaseClient
       .from('products')
-      .select('name, price')
+      .select('name, price, category, image_url')
       .eq('id', id)
       .single();
 
@@ -417,13 +421,17 @@ async function openEditModal(id: number): Promise<void> {
       return;
     }
 
-    const product = data as { name: string; price: number };
+    const product = data as { name: string; price: number; category: string; image_url: string };
 
     editingProductId = id;
     const nameInput = getEl<HTMLInputElement>('edit-name');
     const priceInput = getEl<HTMLInputElement>('edit-price');
+    const categorySelect = getEl<HTMLSelectElement>('edit-category');
+    const imageInput = getEl<HTMLInputElement>('edit-image');
     if (nameInput) nameInput.value = product.name ?? '';
     if (priceInput) priceInput.value = String(product.price ?? '');
+    if (categorySelect) categorySelect.value = product.category ?? 'vestidos';
+    if (imageInput) imageInput.value = product.image_url ?? '';
 
     const modal = getEl<HTMLElement>('edit-modal');
     if (modal) modal.classList.add('active');

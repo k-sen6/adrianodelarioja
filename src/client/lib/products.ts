@@ -29,7 +29,7 @@ export async function createProduct(product: Omit<Product, 'id' | 'created_at'>)
   }
 }
 
-export async function updateProduct(id: number, updates: Partial<Pick<Product, 'name' | 'price'>>): Promise<void> {
+export async function updateProduct(id: number, updates: Partial<Pick<Product, 'name' | 'price' | 'image_url' | 'category'>>): Promise<void> {
   const { error } = await supabase()
     .from('products')
     .update(updates)
