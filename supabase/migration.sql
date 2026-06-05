@@ -82,25 +82,65 @@ AS $$
     );
 $$;
 
+-- Helper: store session_token in session setting (called via RPC from client)
+CREATE OR REPLACE FUNCTION public.set_session_token(token text)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+    SELECT set_config('app.session_token', token, false);
+$$;
+
+-- Helper: get user_id from the current session_token
+CREATE OR REPLACE FUNCTION public.get_session_user_id()
+RETURNS text
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+    SELECT id FROM public.users
+    WHERE session_token = current_setting('app.session_token', true)
+    LIMIT 1;
+$$;
+
 -- PRODUCTS — public read, admin write
 CREATE POLICY "products_select" ON public.products FOR SELECT USING (true);
 CREATE POLICY "products_insert" ON public.products FOR INSERT WITH CHECK (public.is_admin());
 CREATE POLICY "products_update" ON public.products FOR UPDATE USING (public.is_admin());
 CREATE POLICY "products_delete" ON public.products FOR DELETE USING (public.is_admin());
 
--- USERS — anyone can register (INSERT), SELECT is open but client always filters by session_token
+-- USERS — anyone can register, SELECT restricted to own session or admin
 CREATE POLICY "users_insert" ON public.users FOR INSERT WITH CHECK (true);
-CREATE POLICY "users_select" ON public.users FOR SELECT USING (true);
+CREATE POLICY "users_select" ON public.users FOR SELECT USING (
+    auth.role() = 'authenticated'
+    OR session_token = current_setting('app.session_token', true)
+);
 
--- CART — client always filters by user_id in queries
-CREATE POLICY "cart_select" ON public.cart FOR SELECT USING (true);
-CREATE POLICY "cart_insert" ON public.cart FOR INSERT WITH CHECK (true);
-CREATE POLICY "cart_delete" ON public.cart FOR DELETE USING (true);
+-- CART — access only own items (via session_token), admins can see all
+CREATE POLICY "cart_select" ON public.cart FOR SELECT USING (
+    auth.role() = 'authenticated'
+    OR user_id = public.get_session_user_id()
+);
+CREATE POLICY "cart_insert" ON public.cart FOR INSERT WITH CHECK (
+    user_id = public.get_session_user_id()
+);
+CREATE POLICY "cart_delete" ON public.cart FOR DELETE USING (
+    auth.role() = 'authenticated'
+    OR user_id = public.get_session_user_id()
+);
 
--- WISHLIST — client always filters by user_id in queries
-CREATE POLICY "wishlist_select" ON public.wishlist FOR SELECT USING (true);
-CREATE POLICY "wishlist_insert" ON public.wishlist FOR INSERT WITH CHECK (true);
-CREATE POLICY "wishlist_delete" ON public.wishlist FOR DELETE USING (true);
+-- WISHLIST — same pattern as cart
+CREATE POLICY "wishlist_select" ON public.wishlist FOR SELECT USING (
+    auth.role() = 'authenticated'
+    OR user_id = public.get_session_user_id()
+);
+CREATE POLICY "wishlist_insert" ON public.wishlist FOR INSERT WITH CHECK (
+    user_id = public.get_session_user_id()
+);
+CREATE POLICY "wishlist_delete" ON public.wishlist FOR DELETE USING (
+    auth.role() = 'authenticated'
+    OR user_id = public.get_session_user_id()
+);
 
 -- ADMINS — only admins can read the admin table
 CREATE POLICY "admins_select" ON public.admins FOR SELECT USING (public.is_admin());

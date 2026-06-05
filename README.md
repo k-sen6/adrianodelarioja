@@ -91,20 +91,28 @@ base-uri 'self';
 form-action 'self'
 ```
 
-- **Sin** `'unsafe-inline'` — todo JS/CSS externo tiene SRI hash
+- **Sin** `'unsafe-inline'` (ni en scripts ni en styles inline)
 - **Sin** `'unsafe-eval'` — no se usa `eval()` ni `new Function()`
 - **Sin** `onclick` — todos los eventos via `addEventListener`
 
 ### Zero Trust Architecture (RLS)
 
-Las políticas de Supabase Row Level Security verifican `session_token` en cada operación:
+Las políticas de Supabase Row Level Security verifican `session_token` en cada operación. El cliente envía su token vía `supabase.rpc('set_session_token', { token })` al iniciar sesión. Las políticas RLS usan una función SECURITY DEFINER que valida el token contra la DB:
 
 ```sql
--- Los clientes solo leen/insertan filas donde user_id = su session_token
-CREATE POLICY "cart_client_access" ON cart
-  FOR ALL USING (user_id IN (
-    SELECT id FROM users WHERE session_token = current_setting('app.session_token', true)
-  ));
+-- Función helper que traduce session_token → user_id
+CREATE OR REPLACE FUNCTION public.get_session_user_id()
+RETURNS text LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT id FROM public.users
+  WHERE session_token = current_setting('app.session_token', true)
+  LIMIT 1;
+$$;
+
+-- Ejemplo: carrito solo accesible por el dueño del session_token
+CREATE POLICY "cart_select" ON public.cart FOR SELECT USING (
+  auth.role() = 'authenticated'           -- admins ven todo
+  OR user_id = public.get_session_user_id() -- clientes ven solo lo suyo
+);
 ```
 
 ### Protecciones adicionales
@@ -112,6 +120,7 @@ CREATE POLICY "cart_client_access" ON cart
 - **SRI hashes** para scripts externos (Supabase SDK)
 - **Rate limiting** en login admin (5 intentos, bloqueo 30s)
 - **Sanitización** de entrada: `sanitizeText()`, `validatePrice()`
+- **Console statements eliminadas en build producción** (via esbuild.drop)
 - **Headers HTTP** via Cloudflare Worker (X-Frame-Options, Permissions-Policy)
 - **Sin secrets en repo** — configuración inyectada por GitHub Actions
 

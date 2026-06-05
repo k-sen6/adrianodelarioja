@@ -89,3 +89,52 @@ export function createProductImage(
   }, { once: true });
   return img;
 }
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+export function createSvgIcon(pathD: string, fill: string = 'none'): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'icon');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', fill);
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('width', '18');
+  svg.setAttribute('height', '18');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', pathD);
+  svg.appendChild(path);
+  return svg;
+}
+
+const HEART_PATH = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
+const CART_PATH = 'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6';
+
+export function createHeartIcon(filled: boolean): SVGSVGElement {
+  return createSvgIcon(HEART_PATH, filled ? 'var(--gold)' : 'none');
+}
+
+export function createCartIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'icon');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('width', '18');
+  svg.setAttribute('height', '18');
+  const c1 = document.createElementNS(SVG_NS, 'circle');
+  c1.setAttribute('cx', '9');
+  c1.setAttribute('cy', '21');
+  c1.setAttribute('r', '1');
+  const c2 = document.createElementNS(SVG_NS, 'circle');
+  c2.setAttribute('cx', '20');
+  c2.setAttribute('cy', '21');
+  c2.setAttribute('r', '1');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', CART_PATH);
+  svg.appendChild(c1);
+  svg.appendChild(c2);
+  svg.appendChild(path);
+  return svg;
+}

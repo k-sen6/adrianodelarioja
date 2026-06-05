@@ -4,6 +4,9 @@ import { resolve } from 'node:path';
 export default defineConfig({
   root: 'public',
   base: './',
+  esbuild: {
+    drop: ['console'],
+  },
   build: {
     outDir: '../dist',
     emptyOutDir: true,

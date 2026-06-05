@@ -9,7 +9,7 @@
   <meta name="color-scheme" content="dark light">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Adriano de la Rioja">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://*.supabase.co; style-src 'self' https://fonts.googleapis.com; img-src 'self' https://i.postimg.cc https://placehold.co data:; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; frame-src 'none'; base-uri 'self'; form-action 'self'">
   <meta property="og:title" content="Adriano de la Rioja · Atelier de Alta Costura">
   <meta property="og:description" content="Moda de autor hecha a mano en La Habana Vieja.">
   <meta property="og:image" content="https://i.postimg.cc/6QSkBPyF/Hero.webp">
@@ -109,7 +109,7 @@
             </svg>
             <span id="cart-count" class="badge">0</span>
           </button>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div class="header-user-section">
             <span id="user-name-display" class="user-name"></span>
             <button id="login-btn" class="header-icon" aria-label="Iniciar sesi&oacute;n">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
@@ -117,7 +117,7 @@
                 <circle cx="12" cy="7" r="4"/>
               </svg>
             </button>
-            <button id="logout-btn" class="header-icon" aria-label="Cerrar sesi&oacute;n" style="display: none;">
+            <button id="logout-btn" class="header-icon" aria-label="Cerrar sesi&oacute;n">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                 <polyline points="16 17 21 12 16 7"/>

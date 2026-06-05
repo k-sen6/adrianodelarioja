@@ -16,6 +16,14 @@ function generateUUID(): string {
   });
 }
 
+async function setSessionToken(token: string): Promise<void> {
+  try {
+    await supabase().rpc('set_session_token', { token });
+  } catch {
+    // Non-critical: RLS will fall back gracefully
+  }
+}
+
 export async function loginUser(name: string, phone: string): Promise<UserSession> {
   const cleanName = name.trim().slice(0, 100);
   const cleanPhone = phone.trim().replace(/\s/g, '').slice(0, 20);
@@ -61,6 +69,7 @@ export async function loginUser(name: string, phone: string): Promise<UserSessio
       }
     }
 
+    await setSessionToken(sessionToken);
     persistUser(user);
     currentUser = user;
     return user;
@@ -69,10 +78,11 @@ export async function loginUser(name: string, phone: string): Promise<UserSessio
   }
 }
 
-export function logoutUser(): void {
+export async function logoutUser(): Promise<void> {
   currentUser = null;
   try {
     localStorage.removeItem(STORAGE_KEY);
+    await supabase().rpc('set_session_token', { token: '' });
   } catch {
     // localStorage may be unavailable
   }
@@ -101,6 +111,7 @@ export async function loadSession(): Promise<UserSession | null> {
       return null;
     }
 
+    await setSessionToken(parsed.session_token);
     currentUser = {
       ...parsed,
       name: (data as { name: string }).name,

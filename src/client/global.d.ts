@@ -49,6 +49,7 @@ interface SupabaseClient {
     signOut(): Promise<{ error: unknown }>;
   };
   from(table: string): SupabaseQueryBuilder;
+  rpc(fn: string, params?: Record<string, unknown>): Promise<SupabaseResponse>;
 }
 
 interface Window {
