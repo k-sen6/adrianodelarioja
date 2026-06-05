@@ -109,7 +109,7 @@ function createProductCard(product: Product): HTMLElement {
 
   const info = createElement('div', { class: 'product-info' });
   const name = createElement('div', { class: 'product-name' }, [product.name]);
-  const price = createElement('div', { class: 'product-price' }, [`CUP ${product.price}`]);
+  const price = createElement('div', { class: 'product-price' }, [` CUP${product.price}`]);
   const actions = createElement('div', { class: 'product-actions' });
 
   const isFav = isInWishlist(product.id);

@@ -38,7 +38,7 @@ export function updateCartUI(): void {
     container.appendChild(
       createElement('div', { class: 'loading' }, ['✨ Tu carrito está vacío ✨'])
     );
-    if (totalSpan) totalSpan.textContent = 'CUP 0';
+    if (totalSpan) totalSpan.textContent = ' CUP0';
     if (countSpan) countSpan.textContent = '0';
     return;
   }
@@ -56,7 +56,7 @@ export function updateCartUI(): void {
 
     const details = createElement('div', { class: 'cart-item-details' });
     const nameEl = createElement('div', { class: 'cart-item-name' }, [item.products?.name ?? 'Producto']);
-    const priceEl = createElement('div', { class: 'cart-item-price' }, [`CUP ${item.products?.price ?? 0}`]);
+    const priceEl = createElement('div', { class: 'cart-item-price' }, [` CUP${item.products?.price ?? 0}`]);
     details.appendChild(nameEl);
     details.appendChild(priceEl);
 
@@ -75,7 +75,7 @@ export function updateCartUI(): void {
     container.appendChild(cartItem);
   }
 
-  if (totalSpan) totalSpan.textContent = `CUP ${total}`;
+  if (totalSpan) totalSpan.textContent = ` CUP${total}`;
   if (countSpan) countSpan.textContent = String(getCartCount());
 }
 
@@ -89,7 +89,7 @@ function enviarWhatsApp(): void {
   const user = getCurrentUser();
   const waNumber = getWhatsAppNumber();
   const productLines = items
-    .map((item) => `• ${item.products?.name} - CUP ${item.products?.price}`)
+    .map((item) => `• ${item.products?.name} -  CUP${item.products?.price}`)
     .join('%0A');
   const total = getCartTotal();
   const userName = user ? user.name : 'Cliente';
@@ -104,7 +104,7 @@ function enviarWhatsApp(): void {
     `📦 *PRODUCTOS:*`,
     `${productLines}`,
     ``,
-    `💰 *TOTAL:* CUP ${total}`,
+    `💰 *TOTAL:*  CUP${total}`,
     ``,
     `📍 *Retiro:* Obispo #508, La Habana Vieja`,
   ].join('%0A');
