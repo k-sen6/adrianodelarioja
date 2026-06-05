@@ -201,7 +201,7 @@ async function loadProductsTable(): Promise<void> {
       tdName.textContent = p.name;
 
       const tdPrice = document.createElement('td');
-      tdPrice.textContent = ` CUP${p.price}`;
+      tdPrice.textContent = `${p.price} CUP`;
 
       const tdCat = document.createElement('td');
       tdCat.textContent = p.category;
@@ -309,7 +309,7 @@ async function loadCarts(): Promise<void> {
 
       const tr = document.createElement('tr');
       const cells = [
-        user.name, user.phone, productNames || '-', ` CUP${total}`, date,
+        user.name, user.phone, productNames || '-', `${total} CUP`, date,
       ];
       for (const text of cells) {
         const td = document.createElement('td');

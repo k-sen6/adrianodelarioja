@@ -56,7 +56,7 @@ export function updateCartUI(): void {
 
     const details = createElement('div', { class: 'cart-item-details' });
     const nameEl = createElement('div', { class: 'cart-item-name' }, [item.products?.name ?? 'Producto']);
-    const priceEl = createElement('div', { class: 'cart-item-price' }, [` CUP${item.products?.price ?? 0}`]);
+    const priceEl = createElement('div', { class: 'cart-item-price' }, [`${item.products?.price ?? 0} CUP`]);
     details.appendChild(nameEl);
     details.appendChild(priceEl);
 
@@ -75,7 +75,7 @@ export function updateCartUI(): void {
     container.appendChild(cartItem);
   }
 
-  if (totalSpan) totalSpan.textContent = ` CUP${total}`;
+  if (totalSpan) totalSpan.textContent = `${total} CUP`;
   if (countSpan) countSpan.textContent = String(getCartCount());
 }
 
@@ -89,7 +89,7 @@ function enviarWhatsApp(): void {
   const user = getCurrentUser();
   const waNumber = getWhatsAppNumber();
   const productLines = items
-    .map((item) => `• ${item.products?.name} -  CUP${item.products?.price}`)
+    .map((item) => `• ${item.products?.name} - ${item.products?.price} CUP`)
     .join('%0A');
   const total = getCartTotal();
   const userName = user ? user.name : 'Cliente';
@@ -104,7 +104,7 @@ function enviarWhatsApp(): void {
     `📦 *PRODUCTOS:*`,
     `${productLines}`,
     ``,
-    `💰 *TOTAL:*  CUP${total}`,
+    `💰 *TOTAL:* ${total} CUP`,
     ``,
     `📍 *Retiro:* Obispo #508, La Habana Vieja`,
   ].join('%0A');
