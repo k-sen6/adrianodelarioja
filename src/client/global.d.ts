@@ -56,6 +56,7 @@ interface Window {
   supabase: {
     createClient(url: string, key: string, options?: SupabaseClientOptions): SupabaseClient;
   };
+  supabaseClient?: () => SupabaseClient;
   __APP_CONFIG__?: {
     supabaseUrl: string;
     supabaseKey: string;

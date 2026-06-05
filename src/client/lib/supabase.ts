@@ -36,3 +36,6 @@ export function getWhatsAppNumber(): string {
 }
 
 export const supabase = () => getSupabaseClient();
+
+// Expose globally for console debugging (F12)
+(window as unknown as Record<string, unknown>).supabaseClient = supabase;
